@@ -1,12 +1,12 @@
 use std::time::Instant;
-use axum::routing::get;
+use axum::routing::{get, post};
 use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use tracing::info;
 use tower_http::trace::TraceLayer;
 
 mod routes;
-mod error_handling;
+mod utils;
 
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
@@ -26,6 +26,7 @@ async fn main() -> Result<(), std::io::Error> {
 
     let app = axum::Router::new()
         .route("/users", get(routes::users::get))
+        .route("/users/register", post(routes::users::register::post))
         .layer(TraceLayer::new_for_http())
         .with_state(db);
 

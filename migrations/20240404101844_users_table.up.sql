@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXISTS users(
     password TEXT NOT NULL,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
-    is_active BOOLEAN NOT NULL,
+    is_active BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 )

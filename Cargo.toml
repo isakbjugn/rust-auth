@@ -7,6 +7,7 @@ authors = ["Isak Kyrre Lichtwarck Bjugn <isakbjugn@gmail.com>"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+argon2 = "0.5.3"
 axum = "0.7.5"
 dotenv = "0.15.0"
 serde = { version = "1.0.197", features = ["derive"] }

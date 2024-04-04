@@ -1,9 +1,11 @@
+pub mod register;
+
 use axum::extract::State;
 use axum::http;
 use axum::response::IntoResponse;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
-use crate::error_handling::AppError;
+use crate::utils::error_handling::AppError;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct User {
