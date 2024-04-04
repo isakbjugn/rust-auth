@@ -17,7 +17,7 @@ pub struct User {
 pub async fn get(
     State(state): State<PgPool>
 ) -> Result<impl IntoResponse, AppError> {
-    let users = get_all(&state).await;
+    let users = get_all(&state).await?;
 
     let response = http::Response::builder()
         .status(http::StatusCode::OK)
@@ -27,10 +27,10 @@ pub async fn get(
     Ok(response)
 }
 
-pub async fn get_all(db: &PgPool) -> Vec<User> {
+pub async fn get_all(db: &PgPool) -> Result<Vec<User>, sqlx::Error> {
     sqlx::query_as!(
         User,
         "SELECT id, email, first_name, last_name, is_active
         FROM users"
-    ).fetch_all(db).await.expect("Klarte ikke å hente brukere")
+    ).fetch_all(db).await
 }

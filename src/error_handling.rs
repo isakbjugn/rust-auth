@@ -1,5 +1,4 @@
 use axum::{http, response::IntoResponse};
-use serde::Serialize;
 use tracing::error;
 
 pub enum AppError {
@@ -14,11 +13,6 @@ impl From<sqlx::Error> for AppError {
 
 impl IntoResponse for AppError {
     fn into_response(self) -> axum::response::Response {
-        #[derive(Serialize)]
-        struct ErrorResponse {
-            message: String,
-        }
-
         match self {
             AppError::SQLError(err) => {
                 error!("SQL error: {:?}", err);
