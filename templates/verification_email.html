@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    <p>Trykk på knappen under for å bekrefte din e-postadresse.</p>
+    <a
+        href="{{ confirmation_link }}"
+        style="
+            color: #fff;
+            background-color: hsla(199, 69%, 84%, 1);
+            width: 320px;
+            font-size: 16px;
+            border-radius: 3px;
+            line-height: 44px;
+            height: 44px;
+            font-family: 'Open Sans', Arial, helvetica, sans-serif;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+          "
+        target="_blank"
+        data-saferedirecturl="https://www.google.com/url?q={{ confirmation_link }}"
+    >
+      <span style="color: #000000">
+        <strong>Bekreft e-postadresse</strong>
+      </span>
+    </a>
+    <p align="center">&nbsp;</p>
+    Dersom knappen over ikke fungerer, kan du forsøke å kopiere lenken under
+    og lime inn i adressefeltet i nettleseren din. Hvis du fortsatt opplevel
+    problemer, vennligst kontakt oss.
+    <br />
+    {{ confirmation_link }}
+    <br />
+    <p align="center">&nbsp;</p>
+    <br />
+    <p style="padding-bottom: 15px; margin: 0">
+        Vennligst bemerk at denne lenken utløper om
+        <strong>{{expiration_time}} minutter</strong>. Den eksakte
+        utløpsdato- og tiden er:
+        <strong>{{ exact_time }}</strong>.
+    </p>
+</body>
+</html>

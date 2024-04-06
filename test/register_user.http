@@ -4,10 +4,10 @@ POST http://localhost:4000/users/register
 Content-Type: application/json
 
 {
-    "email": "geir@olav.no",
-    "password": "sandnes",
-    "first_name": "Geir Olav",
-    "last_name": "Alsvik"
+    "email": "isakbjugn@gmail.com",
+    "password": "lødingen",
+    "first_name": "Isak",
+    "last_name": "Bjugn"
 }
 
 ###

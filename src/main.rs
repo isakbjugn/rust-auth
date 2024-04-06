@@ -1,12 +1,17 @@
 use std::time::Instant;
+
 use axum::routing::{get, post};
 use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
-use tracing::info;
 use tower_http::trace::TraceLayer;
+use tracing::info;
+
+use crate::settings::get_setting;
 
 mod routes;
+mod types;
 mod utils;
+mod settings;
 
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
@@ -14,7 +19,7 @@ async fn main() -> Result<(), std::io::Error> {
     dotenv().ok();
     tracing_subscriber::fmt::init();
 
-    let db_url = std::env::var("DATABASE_URL").expect("Klarte ikke å lese DATABASE_URL fra miljøvariabler");
+    let db_url = get_setting("DATABASE_URL");
 
     info!("Applikasjonen starter...");
 
@@ -27,6 +32,7 @@ async fn main() -> Result<(), std::io::Error> {
     let app = axum::Router::new()
         .route("/users", get(routes::users::get))
         .route("/users/register", post(routes::users::register::post))
+        .route("/users/regenerate-token", post(routes::users::generate_new_token::post))
         .layer(TraceLayer::new_for_http())
         .with_state(db);
 

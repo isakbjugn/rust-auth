@@ -5,8 +5,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use crate::routes::users::User;
-use crate::utils::auth::password::hash;
-use crate::utils::error_handling::AppError;
+use crate::utils::hash;
+use crate::utils::AppError;
 
 #[derive(Deserialize, Serialize)]
 pub struct NewUserRequest {
@@ -36,11 +36,23 @@ pub async fn post(
         last_name: new_user_request.last_name,
     };
     let user = create_user(&state, create_new_user).await?;
+    let user_id = uuid::Uuid::parse_str(&user.id).unwrap();
+
+    crate::utils::send_multipart_email(
+        "RustAuth - På tide å aktivere brukeren din".to_string(),
+        user_id,
+        user.email,
+        user.first_name,
+        user.last_name,
+        "verification_email.html",
+    )
+        .await
+        .unwrap();
 
     let response = http::Response::builder()
         .status(http::StatusCode::CREATED)
-        .header(http::header::CONTENT_TYPE, "application/json")
-        .body(serde_json::to_string(&user).unwrap())
+        .header(http::header::CONTENT_TYPE, "text/plain")
+        .body(String::from("Kontoen din er opprettet, og du kan følge aktiveringslenken vi sendte på e-post for å aktivere den."))
         .unwrap();
     Ok(response)
 }

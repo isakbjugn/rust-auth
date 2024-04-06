@@ -1,11 +1,13 @@
 pub mod register;
+pub mod generate_new_token;
 
 use axum::extract::State;
 use axum::http;
 use axum::response::IntoResponse;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
-use crate::utils::error_handling::AppError;
+
+use crate::utils::AppError;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct User {
