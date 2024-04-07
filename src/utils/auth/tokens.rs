@@ -30,31 +30,29 @@ pub async fn issue_confirmation_token(user_id: uuid::Uuid) -> Result<String, App
     )
 }
 
-pub async fn _verify_confirmation_token(token: String) -> Result<ConfirmationToken, String> {
+pub async fn verify_confirmation_token(token: String) -> Result<ConfirmationToken, AppError> {
     let secret_key = get_setting("SECRET_KEY");
     let hmac_secret = get_setting("HMAC_SECRET");
 
-    let sk = SymmetricKey::<V4>::from(secret_key.as_bytes()).unwrap();
+    let sk = SymmetricKey::<V4>::try_from(secret_key.as_str())?;
 
     let validation_rules = ClaimsValidationRules::new();
-    let untrusted_token = UntrustedToken::<Local, V4>::try_from(&token)
-        .map_err(|e| format!("TokenValidation: {}", e))?;
+    let untrusted_token = UntrustedToken::<Local, V4>::try_from(&token)?;
     let trusted_token = local::decrypt(
         &sk,
         &untrusted_token,
         &validation_rules,
         None,
         Some(hmac_secret.as_bytes()),
-    )
-        .map_err(|e| format!("Pasetor: {}", e))?;
+    )?;
     let claims = trusted_token.payload_claims().unwrap();
     let user_id = serde_json::to_value(claims.get_claim("user_id").unwrap()).unwrap();
 
     match serde_json::from_value::<String>(user_id) {
         Ok(user_id_string) => match uuid::Uuid::parse_str(&user_id_string) {
             Ok(user_id) => Ok(ConfirmationToken { user_id }),
-            Err(e) => Err(format!("{}", e)),
+            Err(e) => Err(AppError::UuidError(format!("{}", e))),
         },
-        Err(e) => Err(format!("{}", e)),
+        Err(e) => Err(AppError::UuidError(format!("{}", e))),
     }
 }

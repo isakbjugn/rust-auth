@@ -3,9 +3,11 @@ use tracing::error;
 
 #[derive(Debug)]
 pub enum AppError {
+    AlreadyActivated,
     NotFound,
     PasetoError(pasetors::errors::Error),
     SQLError(sqlx::Error),
+    UuidError(String),
 }
 
 impl From<sqlx::Error> for AppError {
@@ -23,6 +25,7 @@ impl From<pasetors::errors::Error> for AppError {
 impl IntoResponse for AppError {
     fn into_response(self) -> axum::response::Response {
         match self {
+            AppError::AlreadyActivated => http::StatusCode::FORBIDDEN,
             AppError::NotFound => http::StatusCode::NOT_FOUND,
             AppError::PasetoError(err) => {
                 error!("Paseto error: {:?}", err);
@@ -31,7 +34,11 @@ impl IntoResponse for AppError {
             AppError::SQLError(err) => {
                 error!("SQL error: {:?}", err);
                 http::StatusCode::INTERNAL_SERVER_ERROR
-            }
+            },
+            AppError::UuidError(err) => {
+                error!("UUID error: {:?}", err);
+                http::StatusCode::INTERNAL_SERVER_ERROR
+            },
         }
         .into_response()
     }

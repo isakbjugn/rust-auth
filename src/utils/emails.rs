@@ -1,6 +1,8 @@
 use lettre::AsyncTransport;
 use minijinja::path_loader;
-use crate::settings::{Environment, get_environment, get_setting, get_settings};
+use crate::settings::{get_setting, get_settings};
+use crate::utils::AppError;
+use crate::utils::auth::links::create_confirmation_link;
 
 pub async fn send_email(
     sender_email: Option<String>,
@@ -81,44 +83,11 @@ pub async fn send_multipart_email(
     recipient_first_name: String,
     recipient_last_name: String,
     template_name: &str,
-) -> Result<(), String> {
-    let application_base_url = get_setting("APPLICATION_BASE_URL");
-    let application_port = get_setting("APPLICATION_PORT");
-    let token_expiration: i64 = get_setting("TOKEN_EXPIRATION_MINUTES").parse().unwrap();
-
+) -> Result<(), AppError> {
     let title = subject.clone();
+    let token_expiration: i64 = get_setting("TOKEN_EXPIRATION_MINUTES").parse().unwrap();
+    let confirmation_link = create_confirmation_link(user_id, template_name.to_string()).await?;
 
-    let issued_token = match crate::utils::issue_confirmation_token(user_id).await
-    {
-        Ok(t) => t,
-        Err(e) => {
-            tracing::event!(target: "backend", tracing::Level::ERROR, "{:#?}", e);
-            return Err(format!("{:#?}", e));
-        }
-    };
-    let web_address = {
-        match get_environment() {
-            Environment::Development => format!(
-                "{}:{}",
-                application_base_url,
-                application_port
-            ),
-            Environment::Production => application_base_url
-        }
-    };
-    let confirmation_link = {
-        if template_name == "password_reset_email.html" {
-            format!(
-                "{}/users/password/confirm/change_password?token={}",
-                web_address, issued_token,
-            )
-        } else {
-            format!(
-                "{}/users/register/confirm/?token={}",
-                web_address, issued_token,
-            )
-        }
-    };
     let current_date_time = chrono::Local::now();
     let dt = current_date_time + chrono::Duration::minutes(token_expiration);
 

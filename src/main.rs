@@ -12,6 +12,7 @@ mod routes;
 mod types;
 mod utils;
 mod settings;
+mod db;
 
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
@@ -32,6 +33,7 @@ async fn main() -> Result<(), std::io::Error> {
     let app = axum::Router::new()
         .route("/users", get(routes::users::get))
         .route("/users/register", post(routes::users::register::post))
+        .route("/users/register/confirm", get(routes::users::confirm_registration::get))
         .route("/users/regenerate-token", post(routes::users::generate_new_token::post))
         .layer(TraceLayer::new_for_http())
         .with_state(db);
