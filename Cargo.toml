@@ -10,7 +10,7 @@ authors = ["Isak Kyrre Lichtwarck Bjugn <isakbjugn@gmail.com>"]
 argon2 = "0.5.3"
 axum = "0.7.5"
 chrono = "0.4.37"
-config = { version = "0.14.0", features = ["yaml"] }
+config = { version = "0.14.0", features = ["toml"] }
 dotenv = "0.15.0"
 lettre = { version = "0.11.6", features = ["builder", "tokio1-native-tls"] }
 minijinja = { version = "1.0.16", features = ["loader"] }

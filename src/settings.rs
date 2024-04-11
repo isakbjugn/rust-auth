@@ -37,7 +37,7 @@ pub fn get_settings() -> Result<Settings, config::ConfigError> {
     let settings_directory = base_path.join("settings");
 
     let settings = config::Config::builder()
-        .add_source(config::File::from(settings_directory.join("base.yaml")))
+        .add_source(config::File::from(settings_directory.join("base.toml")))
         .build()?;
 
     settings.try_deserialize::<Settings>()
