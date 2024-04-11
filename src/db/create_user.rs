@@ -10,6 +10,7 @@ pub struct NewUser {
     pub last_name: String,
 }
 
+#[tracing::instrument(name = "Creating a new user in fb", skip(db, new_user), fields(email = %new_user.email))]
 pub async fn create_user(
     db: &PgPool,
     new_user: NewUser,

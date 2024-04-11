@@ -12,6 +12,7 @@ pub struct GenerateTokenRequest {
     email: String
 }
 
+#[tracing::instrument(name = "Generating new token", skip(state, generate_token_request))]
 pub async fn post(
     State(state): State<PgPool>,
     Json(generate_token_request): Json<GenerateTokenRequest>,

@@ -12,6 +12,7 @@ pub struct Parameters {
     token: String,
 }
 
+#[tracing::instrument(name = "Activating user", skip(state, parameters))]
 pub async fn get(
     State(state): State<PgPool>,
     Query(parameters): Query<Parameters>

@@ -1,5 +1,6 @@
 use sqlx::PgPool;
 
+#[tracing::instrument(name = "Activating user", skip(db))]
 pub async fn activate_user(db: &PgPool, user_id: uuid::Uuid) -> Result<(), sqlx::Error> {
     sqlx::query!(
         "UPDATE users

@@ -4,6 +4,7 @@ pub mod activate_user;
 use sqlx::PgPool;
 use crate::types::users::User;
 
+#[tracing::instrument(name = "Getting all users from db", skip(db))]
 pub async fn get_all(db: &PgPool) -> Result<Vec<User>, sqlx::Error> {
     sqlx::query_as!(
         User,
@@ -12,6 +13,7 @@ pub async fn get_all(db: &PgPool) -> Result<Vec<User>, sqlx::Error> {
     ).fetch_all(db).await
 }
 
+#[tracing::instrument(name = "Getting user from db by id", skip(db))]
 pub async fn get_one_inactive_by_id(db: &PgPool, id: uuid::Uuid) -> Result<User, sqlx::Error> {
     sqlx::query_as!(
         User,
@@ -22,6 +24,7 @@ pub async fn get_one_inactive_by_id(db: &PgPool, id: uuid::Uuid) -> Result<User,
     ).fetch_one(db).await
 }
 
+#[tracing::instrument(name = "Getting user from db by email", skip(db))]
 pub async fn get_one_inactive_by_email(db: &PgPool, email: String) -> Result<User, sqlx::Error> {
     sqlx::query_as!(
         User,

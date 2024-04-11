@@ -16,6 +16,7 @@ pub struct NewUserRequest {
     last_name: String,
 }
 
+#[tracing::instrument(name = "Registering a new user", skip(state, new_user_request))]
 pub async fn post(
     State(state): State<PgPool>,
     Json(new_user_request): Json<NewUserRequest>,

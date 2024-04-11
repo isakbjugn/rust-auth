@@ -10,6 +10,7 @@ pub mod register;
 pub mod generate_new_token;
 pub mod confirm_registration;
 
+#[tracing::instrument(name = "Getting all users", skip(state))]
 pub async fn get(
     State(state): State<PgPool>
 ) -> Result<impl IntoResponse, AppError> {
