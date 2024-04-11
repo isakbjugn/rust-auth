@@ -33,10 +33,10 @@ pub async fn post(
         "verification_email.html",
     )
         .await
-        .unwrap();
+        .expect("Klarte ikke å sende e-post!");
 
     let response = http::Response::builder()
-        .status(http::StatusCode::CREATED)
+        .status(http::StatusCode::OK)
         .header(http::header::CONTENT_TYPE, "text/plain")
         .body(String::from("En ny aktiveringslenke er sendt til din e-epostadresse."))
         .unwrap();

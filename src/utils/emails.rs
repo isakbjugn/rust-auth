@@ -4,6 +4,7 @@ use crate::settings::{get_setting, get_settings};
 use crate::utils::AppError;
 use crate::utils::auth::links::create_confirmation_link;
 
+#[tracing::instrument(name = "Sending e-mail", skip_all)]
 pub async fn send_email(
     sender_email: Option<String>,
     recipient_email: String,
@@ -76,6 +77,7 @@ pub async fn send_email(
     }
 }
 
+#[tracing::instrument(name = "Sending multipart e-mail", skip(user_id, recipient_first_name, recipient_last_name, template_name))]
 pub async fn send_multipart_email(
     subject: String,
     user_id: uuid::Uuid,
@@ -84,6 +86,7 @@ pub async fn send_multipart_email(
     recipient_last_name: String,
     template_name: &str,
 ) -> Result<(), AppError> {
+    tracing::event!(target: "backend", tracing::Level::DEBUG, subject = subject, email = recipient_email, "Sending multipart email");
     let title = subject.clone();
     let token_expiration: i64 = get_setting("TOKEN_EXPIRATION_MINUTES").parse().unwrap();
     let confirmation_link = create_confirmation_link(user_id, template_name.to_string()).await?;
