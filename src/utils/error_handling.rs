@@ -7,6 +7,7 @@ pub enum AppError {
     NotFound,
     PasetoError(pasetors::errors::Error),
     SQLError(sqlx::Error),
+    Unauthorized,
     UuidError(String),
 }
 
@@ -35,6 +36,7 @@ impl IntoResponse for AppError {
                 error!("SQL error: {:?}", err);
                 http::StatusCode::INTERNAL_SERVER_ERROR
             },
+            AppError::Unauthorized => http::StatusCode::UNAUTHORIZED,
             AppError::UuidError(err) => {
                 error!("UUID error: {:?}", err);
                 http::StatusCode::INTERNAL_SERVER_ERROR

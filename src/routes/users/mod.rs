@@ -9,6 +9,8 @@ use crate::utils::AppError;
 pub mod register;
 pub mod generate_new_token;
 pub mod confirm_registration;
+pub mod login;
+pub mod am_i_logged_in;
 
 #[tracing::instrument(name = "Getting all users", skip(state))]
 pub async fn get(

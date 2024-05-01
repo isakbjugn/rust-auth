@@ -8,7 +8,7 @@ authors = ["Isak Kyrre Lichtwarck Bjugn <isakbjugn@gmail.com>"]
 
 [dependencies]
 argon2 = "0.5.3"
-axum = "0.7.5"
+axum = { version = "0.7.5", features = ["macros"] }
 chrono = "0.4.37"
 config = { version = "0.14.0", features = ["toml"] }
 dotenv = "0.15.0"
@@ -19,6 +19,7 @@ serde = { version = "1.0.197", features = ["derive"] }
 serde_json = "1.0.115"
 sqlx = { version = "0.7.4", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "migrate"] }
 tokio = { version = "1.37.0", features = ["full"] }
+tower-cookies = { version = "0.10.0", features = ["private", "signed"] }
 tower-http = { version = "0.5.2", features = ["trace"] }
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
