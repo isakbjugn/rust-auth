@@ -1,6 +1,0 @@
-###
-
-GET http://localhost:4000/users/am-i-logged-in
-Content-Type: application/json
-
-###

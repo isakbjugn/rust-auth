@@ -1,27 +1,23 @@
-use axum::extract::State;
 use axum::http;
 use axum::response::IntoResponse;
-use sqlx::PgPool;
 
-use crate::db::get_all;
+use crate::extractors::auth_session::AuthSession;
 use crate::utils::AppError;
 
-pub mod register;
-pub mod generate_new_token;
+pub mod all;
 pub mod confirm_registration;
+pub mod generate_new_token;
 pub mod login;
-pub mod am_i_logged_in;
+pub mod register;
 
-#[tracing::instrument(name = "Getting all users", skip(state))]
+#[tracing::instrument(name = "Getting info on a user if logged in", skip(user))]
 pub async fn get(
-    State(state): State<PgPool>
+    AuthSession(user): AuthSession,
 ) -> Result<impl IntoResponse, AppError> {
-    let users = get_all(&state).await?;
-
     let response = http::Response::builder()
         .status(http::StatusCode::OK)
         .header(http::header::CONTENT_TYPE, "application/json")
-        .body(serde_json::to_string(&users).unwrap())
+        .body(serde_json::to_string(&user).unwrap())
         .unwrap();
     Ok(response)
 }

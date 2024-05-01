@@ -32,7 +32,7 @@ pub async fn post(
         })?;
 
     let user_id = uuid::Uuid::parse_str(&user.id).unwrap();
-    let auth_token = issue_auth_token(user_id).await?;
+    let auth_token = issue_auth_token(user_id, user.is_admin).await?;
 
     let auth_cookie_builder = Cookie::build(("rust-auth", auth_token))
         .domain("localhost")

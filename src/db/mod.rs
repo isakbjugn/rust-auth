@@ -8,7 +8,7 @@ use crate::types::users::{User, UserWithPasswordHash};
 pub async fn get_all(db: &PgPool) -> Result<Vec<User>, sqlx::Error> {
     sqlx::query_as!(
         User,
-        "SELECT id, email, first_name, last_name, is_active
+        "SELECT id, email, first_name, last_name, is_active, is_admin
         FROM users"
     ).fetch_all(db).await
 }
@@ -17,7 +17,7 @@ pub async fn get_all(db: &PgPool) -> Result<Vec<User>, sqlx::Error> {
 pub async fn get_one_active_by_id(db: &PgPool, id: uuid::Uuid) -> Result<User, sqlx::Error> {
     sqlx::query_as!(
         User,
-        "SELECT id, email, first_name, last_name, is_active
+        "SELECT id, email, first_name, last_name, is_active, is_admin
         FROM users
         WHERE id = $1 AND is_active = true",
         id
@@ -28,7 +28,7 @@ pub async fn get_one_active_by_id(db: &PgPool, id: uuid::Uuid) -> Result<User, s
 pub async fn get_one_inactive_by_id(db: &PgPool, id: uuid::Uuid) -> Result<User, sqlx::Error> {
     sqlx::query_as!(
         User,
-        "SELECT id, email, first_name, last_name, is_active
+        "SELECT id, email, first_name, last_name, is_active, is_admin
         FROM users
         WHERE id = $1 AND is_active = false",
         id
@@ -39,7 +39,7 @@ pub async fn get_one_inactive_by_id(db: &PgPool, id: uuid::Uuid) -> Result<User,
 pub async fn get_one_active_by_email_with_password_hash(db: &PgPool, email: String) -> Result<UserWithPasswordHash, sqlx::Error> {
     sqlx::query_as!(
         UserWithPasswordHash,
-        "SELECT id, email, password, first_name, last_name, is_active
+        "SELECT id, password, is_admin
         FROM users
         WHERE email = $1 AND is_active = true",
         email
@@ -50,7 +50,7 @@ pub async fn get_one_active_by_email_with_password_hash(db: &PgPool, email: Stri
 pub async fn get_one_inactive_by_email(db: &PgPool, email: String) -> Result<User, sqlx::Error> {
     sqlx::query_as!(
         User,
-        "SELECT id, email, first_name, last_name, is_active
+        "SELECT id, email, first_name, last_name, is_active, is_admin
         FROM users
         WHERE email = $1 AND is_active = false",
         email

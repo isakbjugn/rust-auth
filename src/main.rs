@@ -3,17 +3,18 @@ use std::time::Instant;
 use axum::routing::{get, post};
 use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
+use tower_cookies::CookieManagerLayer;
 use tower_http::trace::TraceLayer;
 use tracing::info;
-use tower_cookies::CookieManagerLayer;
 
 use crate::settings::get_setting;
 
+mod db;
+mod extractors;
 mod routes;
+mod settings;
 mod types;
 mod utils;
-mod settings;
-mod db;
 
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
@@ -33,8 +34,8 @@ async fn main() -> Result<(), std::io::Error> {
 
     let app = axum::Router::new()
         .route("/users", get(routes::users::get))
+        .route("/users/all", get(routes::users::all::get))
         .route("/users/login", post(routes::users::login::post))
-        .route("/users/am-i-logged-in", get(routes::users::am_i_logged_in::get))
         .route("/users/register", post(routes::users::register::post))
         .route("/users/register/confirm", get(routes::users::confirm_registration::get))
         .route("/users/regenerate-token", post(routes::users::generate_new_token::post))

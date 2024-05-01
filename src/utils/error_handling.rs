@@ -5,6 +5,7 @@ use tracing::error;
 pub enum AppError {
     AlreadyActivated,
     NotFound,
+    ParseError(String),
     PasetoError(pasetors::errors::Error),
     SQLError(sqlx::Error),
     Unauthorized,
@@ -28,6 +29,10 @@ impl IntoResponse for AppError {
         match self {
             AppError::AlreadyActivated => http::StatusCode::FORBIDDEN,
             AppError::NotFound => http::StatusCode::NOT_FOUND,
+            AppError::ParseError(err) => {
+                error!("Parse error: {:?}", err);
+                http::StatusCode::INTERNAL_SERVER_ERROR
+            },
             AppError::PasetoError(err) => {
                 error!("Paseto error: {:?}", err);
                 http::StatusCode::INTERNAL_SERVER_ERROR
