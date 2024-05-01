@@ -29,7 +29,13 @@ impl<S> FromRequestParts<S> for AuthSession
                 AppError::Unauthorized
             })?;
 
-        let auth_cookie = cookies.get("rust-auth").expect("No cookie found");
+        let auth_cookie = match cookies.get("rust-auth") {
+            Some(cookie) => cookie,
+            None => {
+                tracing::event!(target: "backend", tracing::Level::ERROR, "No cookie found");
+                return Err(AppError::Unauthorized);
+            }
+        };
         let auth_token: AuthToken = verify_auth_token(auth_cookie.value().to_string()).await
             .map_err(|e| {
                 tracing::event!(target: "backend", tracing::Level::ERROR, "Invalid token: {:#?}", e);
