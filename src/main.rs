@@ -31,6 +31,11 @@ async fn main() -> Result<(), std::io::Error> {
         .connect(&db_url)
         .await
         .expect("Klarte ikke å koble til databasen");
+    
+    sqlx::migrate!("./migrations")
+        .run(&db)
+        .await
+        .expect("Klarte ikke å kjøre migreringer");
 
     let app = axum::Router::new()
         .route("/users", get(routes::users::get))

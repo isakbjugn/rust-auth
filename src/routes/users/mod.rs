@@ -1,4 +1,4 @@
-use axum::http;
+use axum::Json;
 use axum::response::IntoResponse;
 
 use crate::extractors::auth_session::AuthSession;
@@ -14,10 +14,5 @@ pub mod register;
 pub async fn get(
     AuthSession(user): AuthSession,
 ) -> Result<impl IntoResponse, AppError> {
-    let response = http::Response::builder()
-        .status(http::StatusCode::OK)
-        .header(http::header::CONTENT_TYPE, "application/json")
-        .body(serde_json::to_string(&user).unwrap())
-        .unwrap();
-    Ok(response)
+    Ok(Json(user))
 }
