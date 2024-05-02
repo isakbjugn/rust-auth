@@ -12,6 +12,7 @@ COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 # Build application
 RUN cargo install sqlx-cli
+COPY ./migrations ./migrations
 RUN ls -a
 RUN sqlx migrate run
 RUN cargo build --release --bin rust-auth
