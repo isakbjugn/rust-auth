@@ -1,4 +1,4 @@
-FROM rust:latest as chef
+FROM rust:latest AS chef
 RUN cargo install cargo-chef
 WORKDIR app
 
@@ -12,6 +12,7 @@ COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 # Build application
 RUN cargo install sqlx-cli
+RUN ls -a
 RUN sqlx migrate run
 RUN cargo build --release --bin rust-auth
 
