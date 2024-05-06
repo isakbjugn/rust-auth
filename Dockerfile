@@ -22,5 +22,7 @@ RUN cargo build --release --bin rust-auth
 FROM debian:bookworm-slim AS runtime
 WORKDIR app
 COPY --from=builder /app/target/release/rust-auth /usr/local/bin
+ARG PORT
+EXPOSE $PORT
 RUN apt-get update && apt-get install -y libssl-dev
 ENTRYPOINT ["/usr/local/bin/rust-auth"]
