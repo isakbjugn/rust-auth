@@ -3,7 +3,7 @@ use crate::utils::AppError;
 
 pub async fn create_confirmation_link(user_id: uuid::Uuid, template_name: String) -> Result<String, AppError> {
     let application_base_url = get_setting("APPLICATION_BASE_URL");
-    let application_port = get_setting("APPLICATION_PORT");
+    let application_port = get_setting("PORT");
 
     let issued_token = crate::utils::issue_confirmation_token(user_id).await?;
     let web_address = {

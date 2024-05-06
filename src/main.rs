@@ -1,3 +1,4 @@
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::time::Instant;
 
 use axum::routing::{get, post};
@@ -51,8 +52,11 @@ async fn main() -> Result<(), std::io::Error> {
         .layer(CookieManagerLayer::new())
         .with_state(db);
 
-    let port = get_setting("PORT");
-    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await?;
+    let port = std::env::var("PORT").expect("Missing port number");
+    let port = port.parse::<u16>().expect("Invalid port given");
+    let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port);
+
+    let listener = tokio::net::TcpListener::bind(addr).await?;
     info!(
         "Applikasjon klar på {:.2}s - lytter på {}",
         start_time.elapsed().as_secs_f32(),
