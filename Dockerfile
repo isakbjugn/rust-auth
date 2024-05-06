@@ -1,28 +1,46 @@
-FROM rust:latest AS chef
-RUN cargo install cargo-chef
-WORKDIR app
+# Build Stage
+FROM rust:1.74.0 as builder
 
-FROM chef AS planner
-COPY . .
-RUN cargo chef prepare --recipe-path recipe.json
+RUN USER=root cargo new --bin rust-auth
+WORKDIR ./rust-auth
+COPY ./Cargo.toml ./Cargo.toml
+# Build empty app with downloaded dependencies to produce a stable image layer for next build
+RUN cargo build --release
 
-FROM chef AS builder
-COPY --from=planner /app/recipe.json recipe.json
-# Build dependencies - this is the caching Docker layer!
-RUN cargo chef cook --release --recipe-path recipe.json
-# Build application
+# Build web app with own code
+RUN rm src/*.rs
+ADD . ./
+RUN rm ./target/release/deps/rust_auth*
+
 ARG DATABASE_URL
 RUN cargo install sqlx-cli
 COPY ./migrations ./migrations
 RUN ls -a
 RUN sqlx migrate run
-RUN cargo build --release --bin rust-auth
+RUN cargo build --release
 
-# We do not need the Rust toolchain to run the binary!
-FROM debian:bookworm-slim AS runtime
-WORKDIR app
-COPY --from=builder /app/target/release/rust-auth /usr/local/bin
+
+FROM debian:buster-slim
+ARG APP=/usr/src/app
+
+RUN apt-get update \
+    && apt-get install -y ca-certificates tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
 EXPOSE 4000
-ENV PORT 4000
-RUN apt-get update && apt-get install -y libssl-dev
-CMD ["/usr/local/bin/rust-auth"]
+
+ENV TZ=Etc/UTC \
+    APP_USER=appuser
+
+RUN groupadd $APP_USER \
+    && useradd -g $APP_USER $APP_USER \
+    && mkdir -p ${APP}
+
+COPY --from=builder /rust-auth/target/release/rust-auth ${APP}/rust-auth
+
+RUN chown -R $APP_USER:$APP_USER ${APP}
+
+USER $APP_USER
+WORKDIR ${APP}
+
+CMD ["./rust-auth"]
