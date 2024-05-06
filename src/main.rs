@@ -31,13 +31,16 @@ async fn main() -> Result<(), std::io::Error> {
         .connect(&db_url)
         .await
         .expect("Klarte ikke å koble til databasen");
-    
+
+    /*
     sqlx::migrate!("./migrations")
         .run(&db)
         .await
         .expect("Klarte ikke å kjøre migreringer");
+     */
 
     let app = axum::Router::new()
+        .route("/", get(routes::get))
         .route("/users", get(routes::users::get))
         .route("/users/all", get(routes::users::all::get))
         .route("/users/login", post(routes::users::login::post))
@@ -48,7 +51,8 @@ async fn main() -> Result<(), std::io::Error> {
         .layer(CookieManagerLayer::new())
         .with_state(db);
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:4000").await?;
+    let port = get_setting("PORT");
+    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await?;
     info!(
         "Applikasjon klar på {:.2}s - lytter på {}",
         start_time.elapsed().as_secs_f32(),
