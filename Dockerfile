@@ -25,4 +25,4 @@ COPY --from=builder /app/target/release/rust-auth /usr/local/bin
 ENV PORT=4000
 EXPOSE $PORT
 RUN apt-get update && apt-get install -y libssl-dev
-ENTRYPOINT ["/usr/local/bin/rust-auth"]
+CMD ["/usr/local/bin/rust-auth"]
