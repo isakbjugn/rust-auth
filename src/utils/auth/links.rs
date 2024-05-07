@@ -1,21 +1,10 @@
-use crate::settings::{Environment, get_environment, get_setting};
+use crate::settings::get_web_address;
 use crate::utils::AppError;
 
 pub async fn create_confirmation_link(user_id: uuid::Uuid, template_name: String) -> Result<String, AppError> {
-    let application_base_url = get_setting("APPLICATION_BASE_URL");
-    let application_port = get_setting("PORT");
-
     let issued_token = crate::utils::issue_confirmation_token(user_id).await?;
-    let web_address = {
-        match get_environment() {
-            Environment::Development => format!(
-                "{}:{}",
-                application_base_url,
-                application_port
-            ),
-            Environment::Production => application_base_url
-        }
-    };
+    let web_address = get_web_address();
+
     let confirmation_link = {
         if template_name == "password_reset_email.html" {
             format!(

@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-pub enum Environment {
+enum Environment {
     Development,
     Production,
 }
@@ -10,7 +10,7 @@ pub fn get_setting(key: &str) -> String {
     std::env::var(key).expect("Klarte ikke å lese {} fra miljøvariabler.")
 }
 
-pub fn get_environment() -> Environment {
+fn get_environment() -> Environment {
     dotenv::dotenv().ok();
     match std::env::var("ENVIRONMENT").expect("Klarte ikke å lese ENVIRONMENT fra miljøvariabler.") {
         s if s == "development" => Environment::Development,
@@ -41,4 +41,18 @@ pub fn get_settings() -> Result<Settings, config::ConfigError> {
         .build()?;
 
     settings.try_deserialize::<Settings>()
+}
+
+pub fn get_web_address() -> String {
+    let application_base_url = get_setting("APPLICATION_BASE_URL");
+    let application_port = get_setting("PORT");
+    
+    match get_environment() {
+        Environment::Development => format!(
+            "{}:{}",
+            application_base_url,
+            application_port
+        ),
+        Environment::Production => application_base_url
+    }
 }

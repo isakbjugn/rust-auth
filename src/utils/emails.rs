@@ -1,6 +1,6 @@
 use lettre::AsyncTransport;
 use minijinja::path_loader;
-use crate::settings::{get_setting, get_settings};
+use crate::settings::get_setting;
 use crate::utils::AppError;
 use crate::utils::auth::links::create_confirmation_link;
 
@@ -14,16 +14,20 @@ pub async fn send_email(
     html_content: impl Into<String>,
     text_content: impl Into<String>,
 ) -> Result<(), String> {
-    let settings = get_settings().expect("Klarte ikke å hente innstillinger");
+    let email_app_user_display_name = get_setting("EMAIL_APP_USER_DISPLAY_NAME");
+    let email_app_user = get_setting("EMAIL_APP_USER");
+    let email_app_password = get_setting("EMAIL_APP_PASSWORD");
+    let email_host = get_setting("EMAIL_HOST");
+    
     let email = lettre::Message::builder()
         .from(
             format!(
                 "{} <{}>",
-                settings.email.app_user_display_name,
+                email_app_user_display_name,
                 if sender_email.is_some() {
                     sender_email.unwrap()
                 } else {
-                    settings.email.app_user.clone()
+                    email_app_user.clone()
                 }
             )
                 .parse()
@@ -53,13 +57,13 @@ pub async fn send_email(
         .unwrap();
 
     let creds = lettre::transport::smtp::authentication::Credentials::new(
-        settings.email.app_user,
-        settings.email.app_password,
+        email_app_user,
+        email_app_password,
     );
 
     // Open a remote connection to gmail
     let mailer: lettre::AsyncSmtpTransport<lettre::Tokio1Executor> =
-        lettre::AsyncSmtpTransport::<lettre::Tokio1Executor>::relay(&settings.email.host)
+        lettre::AsyncSmtpTransport::<lettre::Tokio1Executor>::relay(&email_host)
             .unwrap()
             .credentials(creds)
             .build();
