@@ -20,7 +20,7 @@ RUN sqlx migrate run
 RUN cargo build --release
 
 
-FROM debian:buster-slim
+FROM debian:bookworm-slim
 ARG APP=/usr/src/app
 
 RUN apt-get update \
