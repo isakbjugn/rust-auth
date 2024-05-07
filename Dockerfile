@@ -1,5 +1,5 @@
 # Build Stage
-FROM rust:latest as builder
+FROM rust:latest AS builder
 
 RUN USER=root cargo new --bin rust-auth
 WORKDIR ./rust-auth
@@ -9,18 +9,19 @@ RUN cargo build --release
 
 # Build web app with own code
 RUN rm src/*.rs
+RUN ls -a
 ADD . ./
+RUN ls -a
 RUN rm ./target/release/deps/rust_auth*
 
 ARG DATABASE_URL
 RUN cargo install sqlx-cli
 COPY ./migrations ./migrations
-RUN ls -a
 RUN sqlx migrate run
 RUN cargo build --release
 
 
-FROM debian:bookworm-slim
+FROM debian:bookworm-slim AS runtime
 ARG APP=/usr/src/app
 
 RUN apt-get update \
