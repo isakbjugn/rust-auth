@@ -1,5 +1,5 @@
 # Build Stage
-FROM rust:1.74.0 as builder
+FROM rust:latest as builder
 
 RUN USER=root cargo new --bin rust-auth
 WORKDIR ./rust-auth
