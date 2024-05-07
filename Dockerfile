@@ -10,7 +10,9 @@ RUN cargo build --release
 # Build web app with own code
 RUN rm src/*.rs
 RUN ls -a
-ADD . ./
+ADD ./src ./src
+ADD ./migrations ./migrations
+ADD ./templates ./templates
 RUN ls -a
 RUN rm ./target/release/deps/rust_auth*
 
