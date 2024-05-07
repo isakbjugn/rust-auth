@@ -4,22 +4,25 @@ FROM rust:latest AS builder
 RUN USER=root cargo new --bin rust-auth
 WORKDIR ./rust-auth
 COPY ./Cargo.toml ./Cargo.toml
+
 # Build empty app with downloaded dependencies to produce a stable image layer for next build
 RUN cargo build --release
 
-# Build web app with own code
+# Remove unused source and dependencies that must be rebuilt
 RUN rm src/*.rs
-RUN ls -a
+RUN rm ./target/release/deps/rust_auth*
+
+# Copy the source files and migrations
 ADD ./src ./src
 ADD ./migrations ./migrations
 ADD ./templates ./templates
-RUN ls -a
-RUN rm ./target/release/deps/rust_auth*
 
+# Install sqlx CLI and run database migrations
 ARG DATABASE_URL
 RUN cargo install sqlx-cli
-COPY ./migrations ./migrations
 RUN sqlx migrate run
+
+# Build web app with own code
 RUN cargo build --release
 
 

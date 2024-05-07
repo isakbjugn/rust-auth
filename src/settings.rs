@@ -32,7 +32,7 @@ pub struct EmailSettings {
     pub app_user_display_name: String,
 }
 
-pub fn get_settings() -> Result<Settings, config::ConfigError> {
+fn _get_settings() -> Result<Settings, config::ConfigError> {
     let base_path = std::env::current_dir().expect("Klarte ikke å finne gjeldende katalog");
     let settings_directory = base_path.join("settings");
 
