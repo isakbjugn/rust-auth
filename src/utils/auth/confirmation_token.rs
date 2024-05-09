@@ -31,7 +31,7 @@ pub async fn issue_confirmation_token(user_id: uuid::Uuid) -> Result<String, App
 }
 
 pub async fn verify_confirmation_token(token: String) -> Result<ConfirmationToken, AppError> {
-    let secret_key = get_setting("SECRET_KEY");
+    let secret_key = get_setting("SYMMETRIC_KEY");
     let hmac_secret = get_setting("HMAC_SECRET");
 
     let symmetric_key = SymmetricKey::<V4>::try_from(secret_key.as_str())?;

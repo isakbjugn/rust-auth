@@ -7,7 +7,10 @@ enum Environment {
 
 pub fn get_setting(key: &str) -> String {
     dotenv::dotenv().ok();
-    std::env::var(key).expect("Klarte ikke å lese {} fra miljøvariabler.")
+    match std::env::var(key) {
+        Ok(value) => value,
+        Err(_) => panic!("Klarte ikke å lese {} fra miljøvariabler.", key),
+    }
 }
 
 fn get_environment() -> Environment {
