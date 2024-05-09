@@ -15,7 +15,6 @@ RUN rm ./target/release/deps/rust_auth*
 # Copy the source files and migrations
 ADD ./src ./src
 ADD ./migrations ./migrations
-ADD ./templates ./templates
 
 # Install sqlx CLI and run database migrations
 ARG DATABASE_URL

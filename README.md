@@ -24,3 +24,19 @@ Infokapsler (eng. *cookies*) ved disse http-kallene lagres i `.idea/httpRequests
 
 ### Versjonskontroll
 Bruk `git diff ':!*.lock'` for å vise lokale endringer uten å inkludere endringer i `Cargo.lock`.
+
+## Databasetilkobling
+For å koble til databasen kan du bruke `psql` (som følger med i yum-repoet `postgresql`) med argumenter fra [railway.app](https://railway.app):
+
+```bash
+PGPASSWORD=******** psql -h <PGHOST> -U <PGUSER> -p <PGPORT> -d <PGDATABASE>
+```
+
+Eksempel på spørring:
+
+```postgresql
+SELECT id, email, first_name, last_name, is_active, is_admin
+FROM users;
+```
+
+`psql`-shellet avsluttes med kommandoen `\q`.
