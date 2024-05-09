@@ -27,7 +27,6 @@ pub enum Environment {
 pub struct ApplicationSettings {
     pub protocol: String,
     pub host: String,
-    pub port: u16,
 }
 
 #[derive(Debug, Deserialize)]
@@ -59,6 +58,7 @@ pub struct Settings {
     pub email: EmailSettings,
     pub environment: Environment,
     pub paseto: PasetoSettings,
+    pub port: u16,
     pub tenant: TenantSettings,
     pub token: TokenSettings,
 }
@@ -87,7 +87,7 @@ impl Settings {
     pub fn base_url(&self) -> String {
         let base_without_port = format!("{}://{}", self.application.protocol, self.application.host);
         match self.environment {
-            Environment::Development => format!("{}:{}", base_without_port, self.application.port),
+            Environment::Development => format!("{}:{}", base_without_port, self.port),
             Environment::Production => base_without_port,
         }
     }

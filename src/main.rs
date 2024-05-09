@@ -48,7 +48,7 @@ async fn main() -> Result<(), std::io::Error> {
         .layer(CookieManagerLayer::new())
         .with_state(db);
 
-    let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), settings().application.port);
+    let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), settings().port);
 
     let listener = tokio::net::TcpListener::bind(addr).await?;
     info!(
