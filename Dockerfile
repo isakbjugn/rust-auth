@@ -41,6 +41,7 @@ RUN groupadd $APP_USER \
 
 COPY --from=builder /rust-auth/target/release/rust-auth ${APP}/rust-auth
 COPY templates ${APP}/templates
+COPY settings ${APP}/settings
 
 RUN chown -R $APP_USER:$APP_USER ${APP}
 

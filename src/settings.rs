@@ -1,33 +1,14 @@
+use config::{Config, ConfigError, File};
 use serde::Deserialize;
 
-enum Environment {
-    Development,
-    Production,
+#[derive(Debug, Deserialize)]
+#[allow(unused)]
+pub struct DatabaseSettings {
+    pub url: String,
 }
 
-pub fn get_setting(key: &str) -> String {
-    dotenv::dotenv().ok();
-    match std::env::var(key) {
-        Ok(value) => value,
-        Err(_) => panic!("Klarte ikke å lese {} fra miljøvariabler.", key),
-    }
-}
-
-fn get_environment() -> Environment {
-    dotenv::dotenv().ok();
-    match std::env::var("ENVIRONMENT").expect("Klarte ikke å lese ENVIRONMENT fra miljøvariabler.") {
-        s if s == "development" => Environment::Development,
-        s if s == "production" => Environment::Production,
-        _ => panic!("Ugyldig ENVIRONMENT-verdi. Mulige verdier er 'development' og 'production'."),
-    }
-}
-
-#[derive(serde::Deserialize, Clone)]
-pub struct Settings {
-    pub email: EmailSettings,
-}
-
-#[derive(Deserialize, Clone)]
+#[derive(Debug, Deserialize)]
+#[allow(unused)]
 pub struct EmailSettings {
     pub host: String,
     pub app_user: String,
@@ -35,27 +16,84 @@ pub struct EmailSettings {
     pub app_user_display_name: String,
 }
 
-fn _get_settings() -> Result<Settings, config::ConfigError> {
-    let base_path = std::env::current_dir().expect("Klarte ikke å finne gjeldende katalog");
-    let settings_directory = base_path.join("settings");
-
-    let settings = config::Config::builder()
-        .add_source(config::File::from(settings_directory.join("base.toml")))
-        .build()?;
-
-    settings.try_deserialize::<Settings>()
+#[derive(Debug, Deserialize)]
+pub enum Environment {
+    Development,
+    Production,
 }
 
-pub fn get_web_address() -> String {
-    let application_base_url = get_setting("APPLICATION_BASE_URL");
-    let application_port = get_setting("PORT");
-    
-    match get_environment() {
-        Environment::Development => format!(
-            "{}:{}",
-            application_base_url,
-            application_port
-        ),
-        Environment::Production => application_base_url
+#[derive(Debug, Deserialize)]
+#[allow(unused)]
+pub struct ApplicationSettings {
+    pub protocol: String,
+    pub host: String,
+    pub port: u16,
+}
+
+#[derive(Debug, Deserialize)]
+#[allow(unused)]
+pub struct PasetoSettings {
+    pub symmetric_key: String,
+    pub asymmetric_secret_key: String,
+    pub asymmetric_public_key: String,
+    pub hmac_secret: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[allow(unused)]
+pub struct TenantSettings {
+    pub secret: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[allow(unused)]
+pub struct TokenSettings {
+    pub expiration_minutes: u16,
+}
+
+#[derive(Debug, Deserialize)]
+#[allow(unused)]
+pub struct Settings {
+    pub application: ApplicationSettings,
+    pub database: DatabaseSettings,
+    pub email: EmailSettings,
+    pub environment: Environment,
+    pub paseto: PasetoSettings,
+    pub tenant: TenantSettings,
+    pub token: TokenSettings,
+}
+
+impl Settings {
+    fn new() -> Result<Self, ConfigError> {
+        dotenv::dotenv().ok();
+        // https://github.com/mehcode/config-rs/blob/master/examples/hierarchical-env/settings.rs
+        let environment = std::env::var("ENVIRONMENT").unwrap_or_else(|_| "development".into());
+
+        let settings = Config::builder()
+            .add_source(File::with_name("settings/base"))
+            .add_source(
+                File::with_name(&format!("settings/{}", environment))
+                    .required(false),
+            )
+            .add_source(config::Environment::default()
+                .prefix_separator("_")
+                .separator("_")
+            )
+            .set_override("environment", environment)?
+            .build()?;
+
+        settings.try_deserialize()
     }
+    pub fn base_url(&self) -> String {
+        let base_without_port = format!("{}://{}", self.application.protocol, self.application.host);
+        match self.environment {
+            Environment::Development => format!("{}:{}", base_without_port, self.application.port),
+            Environment::Production => base_without_port,
+        }
+    }
+}
+
+pub fn settings() -> &'static Settings {
+    static SETTINGS: std::sync::OnceLock<Settings> = std::sync::OnceLock::new();
+    SETTINGS.get_or_init(|| Settings::new().expect("Klarte ikke å laste inn konfigurasjonen"))
 }

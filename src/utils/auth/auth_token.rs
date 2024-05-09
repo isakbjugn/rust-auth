@@ -4,7 +4,7 @@ use pasetors::keys::{AsymmetricPublicKey, AsymmetricSecretKey};
 use pasetors::token::UntrustedToken;
 use pasetors::version4::V4;
 
-use crate::settings::get_setting;
+use crate::settings::settings;
 use crate::types::tokens::AuthToken;
 use crate::utils::AppError;
 
@@ -17,25 +17,20 @@ pub async fn issue_auth_token(user_id: uuid::Uuid, is_admin: bool) -> Result<Str
     claims.add_additional("user_id", user_id.to_string()).unwrap();
     claims.add_additional("is_admin", is_admin).unwrap();
 
-    let secret = get_setting("ASYMMETRIC_SECRET_KEY");
-    let tenant_secret = get_setting("TENANT_SECRET");
-    let secret_key = AsymmetricSecretKey::<V4>::try_from(secret.as_str())?;
+    let secret_key = AsymmetricSecretKey::<V4>::try_from(settings().paseto.asymmetric_secret_key.as_str())?;
 
     Ok(public::sign(
         &secret_key,
         &claims,
         None,
-        Some(tenant_secret.as_bytes()),
+        Some(settings().tenant.secret.as_bytes()),
     )
         .unwrap()
     )
 }
 
 pub async fn verify_auth_token(token: String) -> Result<AuthToken, AppError> {
-    let secret = get_setting("ASYMMETRIC_PUBLIC_KEY");
-    let tenant_secret = get_setting("TENANT_SECRET");
-
-    let public_key = AsymmetricPublicKey::<V4>::try_from(secret.as_str())?;
+    let public_key = AsymmetricPublicKey::<V4>::try_from(settings().paseto.asymmetric_public_key.as_str())?;
 
     let validation_rules = ClaimsValidationRules::new();
     let untrusted_token = UntrustedToken::<Public, V4>::try_from(&token)?;
@@ -44,7 +39,7 @@ pub async fn verify_auth_token(token: String) -> Result<AuthToken, AppError> {
         &untrusted_token,
         &validation_rules,
         None,
-        Some(tenant_secret.as_bytes()),
+        Some(settings().tenant.secret.as_bytes()),
     )?;
     let claims = trusted_token.payload_claims().unwrap();
     let user_id = serde_json::to_value(claims.get_claim("user_id").unwrap()).unwrap();

@@ -2,13 +2,12 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::time::Instant;
 
 use axum::routing::{get, post};
-use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use tower_cookies::CookieManagerLayer;
 use tower_http::trace::TraceLayer;
 use tracing::info;
 
-use crate::settings::get_setting;
+use crate::settings::settings;
 
 mod db;
 mod extractors;
@@ -20,16 +19,13 @@ mod utils;
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
     let start_time = Instant::now();
-    dotenv().ok();
     tracing_subscriber::fmt::init();
-
-    let db_url = get_setting("DATABASE_URL");
 
     info!("Applikasjonen starter...");
 
     let db = PgPoolOptions::new()
         .max_connections(128)
-        .connect(&db_url)
+        .connect(&settings().database.url)
         .await
         .expect("Klarte ikke å koble til databasen");
 
@@ -52,9 +48,7 @@ async fn main() -> Result<(), std::io::Error> {
         .layer(CookieManagerLayer::new())
         .with_state(db);
 
-    let port = std::env::var("PORT").expect("Missing port number");
-    let port = port.parse::<u16>().expect("Invalid port given");
-    let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port);
+    let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), settings().application.port);
 
     let listener = tokio::net::TcpListener::bind(addr).await?;
     info!(

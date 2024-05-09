@@ -1,6 +1,6 @@
 use lettre::AsyncTransport;
 use minijinja::path_loader;
-use crate::settings::get_setting;
+use crate::settings::settings;
 use crate::utils::AppError;
 use crate::utils::auth::links::create_confirmation_link;
 
@@ -14,20 +14,15 @@ pub async fn send_email(
     html_content: impl Into<String>,
     text_content: impl Into<String>,
 ) -> Result<(), String> {
-    let email_app_user_display_name = get_setting("EMAIL_APP_USER_DISPLAY_NAME");
-    let email_app_user = get_setting("EMAIL_APP_USER");
-    let email_app_password = get_setting("EMAIL_APP_PASSWORD");
-    let email_host = get_setting("EMAIL_HOST");
-    
     let email = lettre::Message::builder()
         .from(
             format!(
                 "{} <{}>",
-                email_app_user_display_name,
+                settings().email.app_user_display_name,
                 if sender_email.is_some() {
                     sender_email.unwrap()
                 } else {
-                    email_app_user.clone()
+                    settings().email.app_user.clone()
                 }
             )
                 .parse()
@@ -57,13 +52,13 @@ pub async fn send_email(
         .unwrap();
 
     let creds = lettre::transport::smtp::authentication::Credentials::new(
-        email_app_user,
-        email_app_password,
+        settings().email.app_user.clone(),
+        settings().email.app_password.clone(),
     );
 
     // Open a remote connection to gmail
     let mailer: lettre::AsyncSmtpTransport<lettre::Tokio1Executor> =
-        lettre::AsyncSmtpTransport::<lettre::Tokio1Executor>::relay(&email_host)
+        lettre::AsyncSmtpTransport::<lettre::Tokio1Executor>::relay(&settings().email.host)
             .unwrap()
             .credentials(creds)
             .build();
@@ -92,11 +87,10 @@ pub async fn send_multipart_email(
 ) -> Result<(), AppError> {
     tracing::event!(target: "backend", tracing::Level::DEBUG, subject = subject, email = recipient_email, "Sending multipart email");
     let title = subject.clone();
-    let token_expiration: i64 = get_setting("TOKEN_EXPIRATION_MINUTES").parse().unwrap();
     let confirmation_link = create_confirmation_link(user_id, template_name.to_string()).await?;
 
     let current_date_time = chrono::Local::now();
-    let dt = current_date_time + chrono::Duration::minutes(token_expiration);
+    let dt = current_date_time + chrono::Duration::minutes(settings().token.expiration_minutes.into());
 
     let mut template_env = minijinja::Environment::new();
     template_env.set_loader(path_loader("templates"));
@@ -105,7 +99,7 @@ pub async fn send_multipart_email(
     let ctx = minijinja::context! {
         title => &title,
         confirmation_link => &confirmation_link,
-        expiration_time => &token_expiration,
+        expiration_time => &settings().token.expiration_minutes,
         exact_time => &dt.format("%A %B %d, %Y at %r").to_string()
     };
     let html_text = template.render(ctx).unwrap();
