@@ -3,8 +3,9 @@ use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 #[allow(unused)]
-pub struct DatabaseSettings {
-    pub url: String,
+pub struct ApplicationSettings {
+    pub protocol: String,
+    pub host: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -20,13 +21,6 @@ pub struct EmailSettings {
 pub enum Environment {
     Development,
     Production,
-}
-
-#[derive(Debug, Deserialize)]
-#[allow(unused)]
-pub struct ApplicationSettings {
-    pub protocol: String,
-    pub host: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -54,7 +48,7 @@ pub struct TokenSettings {
 #[allow(unused)]
 pub struct Settings {
     pub application: ApplicationSettings,
-    pub database: DatabaseSettings,
+    pub database_url: String,
     pub email: EmailSettings,
     pub environment: Environment,
     pub paseto: PasetoSettings,
@@ -75,9 +69,9 @@ impl Settings {
                 File::with_name(&format!("settings/{}", environment))
                     .required(false),
             )
+            // Tilstrekkelig for DATABASE_URL -> database.url
             .add_source(config::Environment::default()
-                .prefix_separator("_")
-                .separator("_")
+                .separator("__")
             )
             .set_override("environment", environment)?
             .build()?;

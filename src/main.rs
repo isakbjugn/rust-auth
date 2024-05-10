@@ -25,7 +25,7 @@ async fn main() -> Result<(), std::io::Error> {
 
     let db = PgPoolOptions::new()
         .max_connections(128)
-        .connect(&settings().database.url)
+        .connect(&settings().database_url)
         .await
         .expect("Klarte ikke å koble til databasen");
 
