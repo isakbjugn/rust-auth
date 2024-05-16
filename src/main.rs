@@ -38,9 +38,10 @@ async fn main() -> Result<(), std::io::Error> {
 
     let app = axum::Router::new()
         .route("/", get(routes::get))
+        .route("/login", post(routes::login::post))
+        .route("/login/local", post(routes::login::local::post))
         .route("/users", get(routes::users::get))
         .route("/users/all", get(routes::users::all::get))
-        .route("/users/login", post(routes::users::login::post))
         .route("/users/register", post(routes::users::register::post))
         .route("/users/register/confirm", get(routes::users::confirm_registration::get))
         .route("/users/regenerate-token", post(routes::users::generate_new_token::post))

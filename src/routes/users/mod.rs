@@ -7,7 +7,6 @@ use crate::utils::AppError;
 pub mod all;
 pub mod confirm_registration;
 pub mod generate_new_token;
-pub mod login;
 pub mod register;
 
 #[tracing::instrument(name = "Getting info on a user if logged in", skip(user))]

@@ -1,6 +1,6 @@
 ###
 
-POST http://localhost:4000/login
+POST http://localhost:4000/login/local
 Content-Type: application/json
 Accept: application/json
 
@@ -13,7 +13,7 @@ Accept: application/json
 
 ###
 
-POST https://rust-auth-production.up.railway.app/login
+POST https://rust-auth-production.up.railway.app/login/local
 Content-Type: application/json
 
 {

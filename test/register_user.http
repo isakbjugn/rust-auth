@@ -11,3 +11,17 @@ Content-Type: application/json
 }
 
 ###
+
+###
+
+POST rust-auth-production.up.railway.app/users/register
+Content-Type: application/json
+
+{
+  "email": "isakbjugn@gmail.com",
+  "password": "lødingen",
+  "first_name": "Isak",
+  "last_name": "Bjugn"
+}
+
+###

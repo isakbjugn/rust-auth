@@ -4,7 +4,18 @@ POST http://localhost:4000/users/regenerate-token
 Content-Type: application/json
 
 {
-    "email": "geir@olav.no"
+    "email": "isakbjugn@gmail.com"
+}
+
+###
+
+###
+
+POST https://rust-auth-production.up.railway.app/users/regenerate-token
+Content-Type: application/json
+
+{
+    "email": "isakbjugn@gmail.com"
 }
 
 ###
