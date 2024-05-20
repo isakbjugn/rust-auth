@@ -4,7 +4,7 @@
 ### Start applikasjonen
 Start docker-containeren i rot-katalogen:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 Start deretter selve applikasjonen:
@@ -15,6 +15,15 @@ cargo watch -q -c -w src/ -x run
 Dersom du ikke ønsker at *cargo*-prosjektet automatisk skal bygge på nytt ved endringer, kan du kjøre:
 ```bash
 cargo run
+```
+
+### Stopp applikasjonen
+```bash
+docker compose down
+```
+eller mer målrettet:
+```bash
+docker stop rust-auth-postgres
 ```
 
 ### Test applikasjonen
