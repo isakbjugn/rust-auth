@@ -4,6 +4,7 @@ use tracing::error;
 #[derive(Debug)]
 pub enum AppError {
     AlreadyActivated,
+    Conflict(String),
     NotFound,
     ParseError(String),
     PasetoError(pasetors::errors::Error),
@@ -28,6 +29,10 @@ impl IntoResponse for AppError {
     fn into_response(self) -> axum::response::Response {
         match self {
             AppError::AlreadyActivated => http::StatusCode::FORBIDDEN,
+            AppError::Conflict(err) => {
+                error!("Conflicting resource error: {:?}", err);
+                http::StatusCode::CONFLICT
+            },
             AppError::NotFound => http::StatusCode::NOT_FOUND,
             AppError::ParseError(err) => {
                 error!("Parse error: {:?}", err);

@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use crate::types::users::User;
+use crate::utils::AppError;
 
 #[derive(Deserialize, Serialize)]
 pub struct NewUser {
@@ -14,7 +15,7 @@ pub struct NewUser {
 pub async fn create_user(
     db: &PgPool,
     new_user: NewUser,
-) -> Result<User, sqlx::Error> {
+) -> Result<User, AppError> {
     let user = sqlx::query_as!(
         User,
         "INSERT INTO users (email, password, first_name, last_name)
@@ -24,7 +25,17 @@ pub async fn create_user(
         new_user.password,
         new_user.first_name,
         new_user.last_name
-    ).fetch_one(db).await?;
+    ).fetch_one(db).await.map_err(|e| {
+        match e {
+            sqlx::Error::Database(db_error) if db_error.is_unique_violation() => {
+                AppError::Conflict(format!("User with email {} already exists", new_user.email))
+            }
+            _ => {
+                tracing::error!("Failed to create user: {:?}", e);
+                AppError::SQLError(e)
+            }
+        }
+    })?;
 
     Ok(user)
 }

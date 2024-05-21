@@ -45,7 +45,7 @@ pub async fn post(
     let response = http::Response::builder()
         .status(http::StatusCode::CREATED)
         .header(http::header::CONTENT_TYPE, "text/plain")
-        .body(String::from("Kontoen din er opprettet, og du kan følge aktiveringslenken vi sendte på e-post for å aktivere den."))
+        .body(String::from("Kontoen din er opprettet. Du kan følge aktiveringslenken vi sendte på e-post for å aktivere den."))
         .unwrap();
     Ok(response)
 }
