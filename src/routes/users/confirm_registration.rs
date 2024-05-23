@@ -1,5 +1,5 @@
-use axum::extract::{Query, State};
-use axum::http;
+use axum::extract::State;
+use axum::{http, Json};
 use axum::response::IntoResponse;
 use serde::Deserialize;
 use sqlx::PgPool;
@@ -13,13 +13,16 @@ pub struct Parameters {
 }
 
 #[tracing::instrument(name = "Activating user", skip(state, parameters))]
-pub async fn get(
+pub async fn post(
     State(state): State<PgPool>,
-    Query(parameters): Query<Parameters>
+    Json(parameters): Json<Parameters>
 ) -> Result<impl IntoResponse, AppError> {
     let confirmation_token = verify_confirmation_token(parameters.token.clone()).await?;
     let user = get_one_inactive_by_id(&state, confirmation_token.user_id).await
-        .map_err(|_| { AppError::AlreadyActivated })?;
+        .map_err(|e| {
+            tracing::event!(target: "backend", tracing::Level::ERROR, "Brukeren er allerede aktivert: {:#?}", e);
+            AppError::AlreadyActivated
+        })?;
     let user_id = uuid::Uuid::parse_str(&user.id).unwrap();
     activate_user(&state, user_id).await?;
 

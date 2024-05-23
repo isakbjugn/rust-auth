@@ -3,18 +3,17 @@ use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 #[allow(unused)]
-pub struct ApplicationSettings {
-    pub protocol: String,
-    pub host: String,
-}
-
-#[derive(Debug, Deserialize)]
-#[allow(unused)]
 pub struct EmailSettings {
     pub host: String,
     pub app_user: String,
     pub app_password: String,
     pub app_user_display_name: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[allow(unused)]
+pub struct FrontendSettings {
+    pub url: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -47,9 +46,9 @@ pub struct TokenSettings {
 #[derive(Debug, Deserialize)]
 #[allow(unused)]
 pub struct Settings {
-    pub application: ApplicationSettings,
     pub database_url: String,
     pub email: EmailSettings,
+    pub frontend: FrontendSettings,
     pub environment: Environment,
     pub paseto: PasetoSettings,
     pub port: u16,
@@ -77,13 +76,6 @@ impl Settings {
             .build()?;
 
         settings.try_deserialize()
-    }
-    pub fn base_url(&self) -> String {
-        let base_without_port = format!("{}://{}", self.application.protocol, self.application.host);
-        match self.environment {
-            Environment::Development => format!("{}:{}", base_without_port, self.port),
-            Environment::Production => base_without_port,
-        }
     }
 }
 

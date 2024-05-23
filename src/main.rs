@@ -43,7 +43,7 @@ async fn main() -> Result<(), std::io::Error> {
         .route("/users", get(routes::users::get))
         .route("/users/all", get(routes::users::all::get))
         .route("/users/register", post(routes::users::register::post))
-        .route("/users/register/confirm", get(routes::users::confirm_registration::get))
+        .route("/users/register/confirm", post(routes::users::confirm_registration::post))
         .route("/users/regenerate-token", post(routes::users::generate_new_token::post))
         .layer(TraceLayer::new_for_http())
         .layer(CookieManagerLayer::new())
