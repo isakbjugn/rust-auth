@@ -24,16 +24,14 @@ export const actions = {
       return fail(400, {error: response.error});
     }
 
-    if (res.headers.has('authorization')) {
-      const authHeader = res.headers.get('authorization');
-      const token = authHeader.split(' ')[1];
-      cookies.set('rust-auth', token, {
-        // httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: true
-      })
-    }
+    const { token } = await res.json();
+
+    cookies.set('rust-auth', token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      path: '/',
+      secure: true
+    })
 
     throw redirect(302, '/user');
   }
