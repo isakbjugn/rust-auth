@@ -1,5 +1,3 @@
-pub mod local;
-
 use axum::extract::State;
 use axum::{http, Json};
 use axum::response::IntoResponse;

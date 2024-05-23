@@ -5,7 +5,6 @@ use axum_extra::headers::Authorization;
 use axum_extra::headers::authorization::Bearer;
 use axum_extra::TypedHeader;
 use sqlx::PgPool;
-use tower_cookies::{Cookie, Cookies};
 
 use crate::db::get_one_active_by_id;
 use crate::types::tokens::AuthToken;
@@ -29,7 +28,7 @@ impl<S> FromRequestParts<S> for AuthSession
             Ok(TypedHeader(auth_header)) => {
                 let auth_token: AuthToken = verify_auth_token(auth_header.token().to_string()).await
                     .map_err(|e| {
-                        tracing::event!(target: "backend", tracing::Level::ERROR, "Invalid token: {:#?}", e);
+                        tracing::event!(target: "backend", tracing::Level::ERROR, "Ugyldig token: {:#?}", e);
                         AppError::Unauthorized
                     })?;
 
@@ -41,35 +40,9 @@ impl<S> FromRequestParts<S> for AuthSession
                     }
                 }
             }
-            Err(_) => {
-                let cookies = Cookies::from_request_parts(parts, state)
-                    .await
-                    .map_err(|e| {
-                        tracing::event!(target: "backend", tracing::Level::ERROR, "Missing token: {:#?}", e);
-                        AppError::Unauthorized
-                    })?;
-
-                let auth_cookie = match cookies.get("rust-auth") {
-                    Some(cookie) => cookie,
-                    None => {
-                        tracing::event!(target: "backend", tracing::Level::ERROR, "No cookie found");
-                        return Err(AppError::Unauthorized);
-                    }
-                };
-                let auth_token: AuthToken = verify_auth_token(auth_cookie.value().to_string()).await
-                    .map_err(|e| {
-                        tracing::event!(target: "backend", tracing::Level::ERROR, "Invalid token: {:#?}", e);
-                        AppError::Unauthorized
-                    })?;
-
-                match get_one_active_by_id(&pool, auth_token.user_id).await {
-                    Ok(user) => Ok(Self(user)),
-                    Err(e) => {
-                        tracing::event!(target: "backend", tracing::Level::ERROR, "Bruker ikke funnet i database: {:#?}", e);
-                        cookies.remove(Cookie::new("rust-auth", ""));
-                        Err(AppError::NotFound)
-                    }
-                }
+            Err(e) => {
+                tracing::event!(target: "backend", tracing::Level::ERROR, "Ingen Authorization Bearer-header: {:#?}", e);
+                Err(AppError::Unauthorized)
             }
         }
     }
