@@ -20,5 +20,5 @@ pub async fn login(
         })?;
 
     let user_id = uuid::Uuid::parse_str(&user.id).unwrap();
-    issue_auth_token(user_id, user.is_admin).await
+    issue_auth_token(user_id).await
 }

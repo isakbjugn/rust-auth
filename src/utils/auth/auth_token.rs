@@ -8,14 +8,13 @@ use crate::settings::settings;
 use crate::types::tokens::AuthToken;
 use crate::utils::AppError;
 
-pub async fn issue_auth_token(user_id: uuid::Uuid, is_admin: bool) -> Result<String, AppError> {
+pub async fn issue_auth_token(user_id: uuid::Uuid) -> Result<String, AppError> {
     let current_date_time = chrono::Local::now();
     let dt = current_date_time + chrono::Duration::minutes(5);
 
     let mut claims = Claims::new().unwrap();
     claims.expiration(&dt.to_rfc3339()).unwrap();
     claims.add_additional("user_id", user_id.to_string()).unwrap();
-    claims.add_additional("is_admin", is_admin).unwrap();
 
     let secret_key = AsymmetricSecretKey::<V4>::try_from(settings().paseto.asymmetric_secret_key.as_str())?;
 
@@ -43,18 +42,12 @@ pub async fn verify_auth_token(token: String) -> Result<AuthToken, AppError> {
     )?;
     let claims = trusted_token.payload_claims().unwrap();
     let user_id = serde_json::to_value(claims.get_claim("user_id").unwrap()).unwrap();
-    let is_admin = serde_json::to_value(claims.get_claim("is_admin").unwrap()).unwrap();
 
     match serde_json::from_value::<String>(user_id) {
         Ok(user_id_string) => match uuid::Uuid::parse_str(&user_id_string) {
-            Ok(user_id) => {
-                match serde_json::from_value::<bool>(is_admin) {
-                    Ok(is_admin) => Ok(AuthToken { user_id, is_admin }),
-                    Err(e) => Err(AppError::ParseError(format!("Kunne ikke parse is_admin fra auth-token, {}", e))),
-                }
-            },
-            Err(e) => Err(AppError::UuidError(format!("Kunne ikke skape Uuid fra is_user, {}", e))),
+            Ok(user_id) => Ok(AuthToken { user_id }),
+            Err(e) => Err(AppError::UuidError(format!("Kunne ikke skape Uuid fra user_id, {}", e))),
         },
-        Err(e) => Err(AppError::UuidError(format!("Kunne ikke parse is_user fra auth-token, {}", e))),
+        Err(e) => Err(AppError::ParseError(format!("Kunne ikke parse user_id fra auth-token, {}", e))),
     }
 }

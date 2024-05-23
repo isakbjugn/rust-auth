@@ -15,5 +15,4 @@ pub struct User {
 pub struct UserWithPasswordHash {
     pub id: String,
     pub password: String,
-    pub is_admin: bool,
 }

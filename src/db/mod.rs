@@ -39,7 +39,7 @@ pub async fn get_one_inactive_by_id(db: &PgPool, id: uuid::Uuid) -> Result<User,
 pub async fn get_one_active_by_email_with_password_hash(db: &PgPool, email: String) -> Result<UserWithPasswordHash, sqlx::Error> {
     sqlx::query_as!(
         UserWithPasswordHash,
-        "SELECT id, password, is_admin
+        "SELECT id, password
         FROM users
         WHERE email = $1 AND is_active = true",
         email
