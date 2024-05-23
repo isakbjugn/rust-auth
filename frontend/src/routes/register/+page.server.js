@@ -3,7 +3,7 @@ import { BASE_API_URI } from '$lib/constants';
 
 /** @type {import('./$types').Actions} */
 export const actions = {
-  default: async ({ request, cookies,  }) => {
+  default: async ({ request }) => {
     const formData = await request.formData();
     const email = formData.get('email');
     const password = formData.get('password');
@@ -39,6 +39,6 @@ export const actions = {
       return fail(400, { error: response.error });
     }
 
-    throw redirect(303, `/register/confirm`);
+    throw redirect(303, `/register/created`);
   }
 };
