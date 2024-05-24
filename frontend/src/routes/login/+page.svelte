@@ -14,8 +14,16 @@
 	form {
 		display: grid;
 		grid-gap: 1em;
-		min-width: 500px;
+		width: 480px;
+		max-width: 480px;
 		margin: 0 auto;
+	}
+	@media screen and (max-width: 512px) {
+		form {
+			width: unset;
+			max-width: 100%;
+			margin: 0 16px;
+		}
 	}
 	label {
 		display: grid;
