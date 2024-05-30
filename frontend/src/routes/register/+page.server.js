@@ -30,15 +30,11 @@ export const actions = {
       body: JSON.stringify(body)
     });
 
-    if (res.status === 409) {
-      return fail(409, { first_name, last_name, email, conflicting_email: true });
-    }
-
     if (!res.ok) {
       const response = await res.json();
       return fail(400, { error: response.error });
     }
 
-    throw redirect(303, `/register/created`);
+    return { success: true  };
   }
 };
