@@ -6,34 +6,48 @@
 	const conditionalEmailProps = form?.email ? { value: form.email } : {};
 </script>
 
-<form method="POST">
-	{#if form?.missing_fields}
-		<p class="error">Please fill out all fields</p>
+<section>
+	{#if form?.success}
+		<div class="success">
+			<p>En aktiveringslenke er nå sendt på e-post</p>
+		</div>
 	{/if}
-	<label>
-		First name
-		<input name="first_name" type="text" required {...conditionalFirstNameProps}>
-	</label>
-	<label>
-		Last name
-		<input name="last_name" type="text" required {...conditionalLastNameProps}>
-	</label>
-	{#if form?.conflicting_email}
-		<p class="error">Email already exists</p>
-	{/if}
-	<label>
-		Email
-		<input name="email" type="email" required {...conditionalEmailProps}>
-	</label>
-	<label>
-		Password
-		<input name="password" type="password" required>
-	</label>
-	<button>Register</button>
-</form>
+	<form method="POST">
+		<fieldset>
+			<legend>Registrer deg</legend>
+			{#if form?.missing_fields}
+				<p class="error">Vennligst fyll ut alle felt</p>
+			{/if}
+			<label>
+				Fornavn
+				<input name="first_name" type="text" required {...conditionalFirstNameProps}>
+			</label>
+			<label>
+				Etternavn
+				<input name="last_name" type="text" required {...conditionalLastNameProps}>
+			</label>
+			<label>
+				E-postadresse
+				<input name="email" type="email" required {...conditionalEmailProps}>
+			</label>
+			<label>
+				Passord
+				<input name="password" type="password" required>
+			</label>
+			<button>Registrer</button>
+		</fieldset>
+	</form>
+</section>
 
 <style>
-	form {
+	.success {
+		border-radius: 10px;
+		padding: 10px 10px 10px 36px;
+		margin: 10px auto;
+		background-color: #c2e7da;
+		width: 480px;
+	}
+	fieldset {
 		display: grid;
 		grid-gap: 1em;
 		width: 480px;

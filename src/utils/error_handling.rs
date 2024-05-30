@@ -1,10 +1,11 @@
 use axum::{http, response::IntoResponse};
 use tracing::error;
+use crate::types::users::User;
 
 #[derive(Debug)]
 pub enum AppError {
     AlreadyActivated,
-    Conflict(String),
+    Conflict(User),
     NotFound,
     ParseError(String),
     PasetoError(pasetors::errors::Error),
@@ -29,8 +30,8 @@ impl IntoResponse for AppError {
     fn into_response(self) -> axum::response::Response {
         match self {
             AppError::AlreadyActivated => http::StatusCode::FORBIDDEN,
-            AppError::Conflict(err) => {
-                error!("Conflicting resource error: {:?}", err);
+            AppError::Conflict(user) => {
+                error!("Conflicting resource error: {:?}", user);
                 http::StatusCode::CONFLICT
             },
             AppError::NotFound => http::StatusCode::NOT_FOUND,
