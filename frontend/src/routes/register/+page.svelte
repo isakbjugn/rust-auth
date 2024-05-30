@@ -1,4 +1,7 @@
 <script>
+	import SuccessMessage from '$lib/components/SuccessMessage.svelte';
+	import ErrorMessage from '$lib/components/ErrorMessage.svelte';
+
 	/** @type {import('./$types').ActionData} */
 	export let form;
 	const conditionalFirstNameProps = form?.first_name ? { value: form.first_name } : {};
@@ -8,9 +11,10 @@
 
 <section>
 	{#if form?.success}
-		<div class="success">
-			<p>En aktiveringslenke er nå sendt på e-post</p>
-		</div>
+		<SuccessMessage>En aktiveringslenke er nå sendt på e-post</SuccessMessage>
+	{/if}
+	{#if form?.error}
+		<ErrorMessage>Noe gikk galt!</ErrorMessage>
 	{/if}
 	<form method="POST">
 		<fieldset>
@@ -40,13 +44,6 @@
 </section>
 
 <style>
-	.success {
-		border-radius: 10px;
-		padding: 10px 10px 10px 36px;
-		margin: 10px auto;
-		background-color: #c2e7da;
-		width: 480px;
-	}
 	fieldset {
 		display: grid;
 		grid-gap: 1em;

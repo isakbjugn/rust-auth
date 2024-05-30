@@ -12,18 +12,18 @@
 </svelte:head>
 
 {#if $page.data.user}
-    <h1>Welcome, {$page.data.user.first_name}!</h1>
+    <h1>Velkommen, {$page.data.user.first_name}!</h1>
     <div class="details">
-        <p>First name: {$page.data.user.first_name}</p>
-        <p>Last name: {$page.data.user.last_name}</p>
-        <span>Email: <a href="mailto:${$page.data.user.email}">{$page.data.user.email}</a></span>
+        <p>Fornav: {$page.data.user.first_name}</p>
+        <p>Etternavn: {$page.data.user.last_name}</p>
+        <span>E-post: <a href="mailto:${$page.data.user.email}">{$page.data.user.email}</a></span>
         <p>Administrator: {$page.data.user.is_admin}</p>
     </div>
     <form method="POST" action="/api/logout">
-        <button>Logout</button>
+        <button>Logg ut</button>
     </form>
 {:else}
-    <p>Loading...</p>
+    <p>Laster...</p>
 {/if}
 
 <style>

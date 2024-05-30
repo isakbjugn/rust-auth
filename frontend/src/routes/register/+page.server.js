@@ -1,4 +1,4 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import { BASE_API_URI } from '$lib/constants';
 
 /** @type {import('./$types').Actions} */
@@ -31,8 +31,7 @@ export const actions = {
     });
 
     if (!res.ok) {
-      const response = await res.json();
-      return fail(400, { error: response.error });
+      return fail(400, { error: true });
     }
 
     return { success: true  };
