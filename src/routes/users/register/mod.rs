@@ -1,3 +1,6 @@
+pub mod confirm;
+pub mod generate_new_token;
+
 use axum::Json;
 use axum::extract::State;
 use serde::Deserialize;

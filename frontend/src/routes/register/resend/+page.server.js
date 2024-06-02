@@ -15,7 +15,7 @@ export const actions = {
       email: email,
     }
 
-    const res = await fetch(`${BASE_API_URI}/users/regenerate-token`, {
+    const res = await fetch(`${BASE_API_URI}/users/register/resend`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
