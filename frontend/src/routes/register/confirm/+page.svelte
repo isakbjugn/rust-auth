@@ -2,7 +2,6 @@
   import { page } from '$app/stores';
   import SuccessMessage from '$lib/components/SuccessMessage.svelte';
   import ErrorMessage from '$lib/components/ErrorMessage.svelte';
-  /** @type {import('./$types').ActionData} */
 </script>
 
 <section>

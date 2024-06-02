@@ -1,7 +1,18 @@
+<script>
+	import ErrorMessage from '$lib/components/ErrorMessage.svelte';
+
+	/** @type {import('./$types').ActionData} */
+	export let form;
+	const conditionalEmailProps = form?.email ? { value: form.email } : {};
+</script>
+
 <form method="POST">
+	{#if form?.error}
+		<ErrorMessage>{form?.error}</ErrorMessage>
+	{/if}
 	<label>
 		Email
-		<input name="email" type="email">
+		<input name="email" type="email" {...conditionalEmailProps}>
 	</label>
 	<label>
 		Password

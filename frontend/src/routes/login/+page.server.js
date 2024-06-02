@@ -1,4 +1,4 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { BASE_API_URI } from '$lib/constants';
 
 /** @type {import('./$types').Actions} */
@@ -20,8 +20,11 @@ export const actions = {
     });
 
     if (!res.ok) {
-      const response = await res.json();
-      return fail(400, {error: response.error});
+      if (res.status === 401) {
+        return fail(401, { error: 'Feil brukernavn eller passord', email: body.email });
+      } else {
+        return error (res.status, { message: 'Noe gikk galt' });
+      }
     }
 
     const { token } = await res.json();
