@@ -1,6 +1,7 @@
 use lettre::AsyncTransport;
 use minijinja::path_loader;
 use crate::settings::settings;
+use crate::types::tokens::TokenPurpose;
 use crate::utils::AppError;
 use crate::utils::auth::links::create_confirmation_link;
 
@@ -76,18 +77,18 @@ pub async fn send_email(
     }
 }
 
-#[tracing::instrument(name = "Sending multipart e-mail", skip(user_id, recipient_first_name, recipient_last_name, template_name))]
+#[tracing::instrument(name = "Sending multipart e-mail", skip(user_id, recipient_first_name, recipient_last_name))]
 pub async fn send_multipart_email(
     subject: String,
     user_id: uuid::Uuid,
     recipient_email: String,
     recipient_first_name: String,
     recipient_last_name: String,
-    template_name: &str,
+    token_purpose: TokenPurpose
 ) -> Result<(), AppError> {
     tracing::event!(target: "backend", tracing::Level::DEBUG, subject = subject, email = recipient_email, "Sending multipart email");
     let title = subject.clone();
-    let confirmation_link = create_confirmation_link(user_id, template_name.to_string()).await?;
+    let confirmation_link = create_confirmation_link(user_id, token_purpose).await?;
 
     let current_date_time = chrono::Local::now();
     let dt = current_date_time + chrono::Duration::minutes(settings().token.expiration_minutes.into());
@@ -95,6 +96,10 @@ pub async fn send_multipart_email(
     let mut template_env = minijinja::Environment::new();
     template_env.set_loader(path_loader("templates"));
 
+    let template_name = match token_purpose {
+        TokenPurpose::Activate => "verification_email.html",
+        TokenPurpose::ResetPassword => "reset_password_email.html",
+    };
     let template = template_env.get_template(template_name).unwrap();
     let ctx = minijinja::context! {
         title => &title,
@@ -123,13 +128,12 @@ pub async fn send_multipart_email(
     Ok(())
 }
 
-#[tracing::instrument(name = "Sending multipart e-mail", skip(recipient_first_name, recipient_last_name, template_name))]
+#[tracing::instrument(name = "Sending multipart e-mail", skip(recipient_first_name, recipient_last_name))]
 pub async fn send_email_about_registration_attempt(
     subject: String,
     recipient_email: String,
     recipient_first_name: String,
     recipient_last_name: String,
-    template_name: &str,
 ) -> Result<(), AppError> {
     tracing::event!(target: "backend", tracing::Level::DEBUG, subject = subject, email = recipient_email, "Sending multipart email");
     let title = subject.clone();
@@ -137,6 +141,7 @@ pub async fn send_email_about_registration_attempt(
     let mut template_env = minijinja::Environment::new();
     template_env.set_loader(path_loader("templates"));
 
+    let template_name = "registration_attempt.html";
     let template = template_env.get_template(template_name).unwrap();
     let ctx = minijinja::context! {
         title => &title,

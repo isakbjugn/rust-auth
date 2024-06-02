@@ -8,6 +8,7 @@ use serde::Deserialize;
 use sqlx::PgPool;
 
 use crate::db::create_user::{create_user, NewUser};
+use crate::types::tokens::TokenPurpose;
 use crate::utils::AppError;
 use crate::utils::hash;
 
@@ -42,7 +43,7 @@ pub async fn post(
                 user.email,
                 user.first_name,
                 user.last_name,
-                "verification_email.html",
+                TokenPurpose::Activate,
             )
                 .await
                 .unwrap();
@@ -54,14 +55,12 @@ pub async fn post(
             
             match user.is_active {
                 true => {
-                    crate::utils::send_multipart_email(
+                    crate::utils::emails::send_email_about_registration_attempt(
                         "RustAuth - Forsøkte du å bytte passord?".to_string(),
-                        user_id,
                         user.email,
                         user.first_name,
                         user.last_name,
-                        "registration_attempt.html",
-                    )
+                    ).await.unwrap();
                 },
                 false => {
                     crate::utils::send_multipart_email(
@@ -70,10 +69,10 @@ pub async fn post(
                         user.email,
                         user.first_name,
                         user.last_name,
-                        "verification_email.html",
-                    )
+                        TokenPurpose::Activate,
+                    ).await.unwrap();
                 }
-            }.await.unwrap();
+            };
             
             Ok(StatusCode::OK)
         },

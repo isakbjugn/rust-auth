@@ -43,6 +43,8 @@ async fn main() -> Result<(), std::io::Error> {
         .route("/users/register", post(routes::users::register::post))
         .route("/users/register/confirm", post(routes::users::register::confirm::post))
         .route("/users/register/resend", post(routes::users::register::generate_new_token::post))
+        .route("/users/reset-password", post(routes::users::reset_password::post))
+        .route("/users/reset-password/confirm", post(routes::users::reset_password::confirm::post))
         .layer(TraceLayer::new_for_http())
         .with_state(db);
 

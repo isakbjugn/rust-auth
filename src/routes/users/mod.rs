@@ -6,6 +6,7 @@ use crate::utils::AppError;
 
 pub mod all;
 pub mod register;
+pub mod reset_password;
 
 #[tracing::instrument(name = "Getting info on a user if logged in", skip(user))]
 pub async fn get(

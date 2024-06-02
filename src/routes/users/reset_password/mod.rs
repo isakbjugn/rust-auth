@@ -1,6 +1,5 @@
+use axum::{http::StatusCode, Json};
 use axum::extract::State;
-use axum::http::StatusCode;
-use axum::Json;
 use axum::response::IntoResponse;
 use serde::Deserialize;
 use sqlx::PgPool;
@@ -9,17 +8,19 @@ use crate::db::get_one_by_email;
 use crate::types::tokens::TokenPurpose;
 use crate::utils::AppError;
 
+pub mod confirm;
+
 #[derive(Deserialize)]
-pub struct GenerateTokenRequest {
-    email: String
+pub struct ResetPasswordRequest {
+    email: String,
 }
 
-#[tracing::instrument(name = "Issuing token for user activation", skip(state, generate_token_request))]
+#[tracing::instrument(name = "Issuing token for password reset", skip(state, reset_password_request))]
 pub async fn post(
     State(state): State<PgPool>,
-    Json(generate_token_request): Json<GenerateTokenRequest>,
+    Json(reset_password_request): Json<ResetPasswordRequest>,
 ) -> Result<impl IntoResponse, AppError> {
-    match get_one_by_email(&state, generate_token_request.email.clone()).await {
+    match get_one_by_email(&state, reset_password_request.email.clone()).await {
         Ok(inactive_user) if !inactive_user.is_active => {
             let user_id = uuid::Uuid::parse_str(&inactive_user.id).unwrap();
             crate::utils::send_multipart_email(
@@ -32,15 +33,18 @@ pub async fn post(
             )
                 .await
                 .expect("Klarte ikke å sende e-post!");
-            
+
             Ok(StatusCode::OK)
         },
         Ok(active_user) if active_user.is_active => {
-            crate::utils::emails::send_email_about_registration_attempt(
-                "RustAuth - Forsøkte du å bytte passord?".to_string(),
+            let user_id = uuid::Uuid::parse_str(&active_user.id).unwrap();
+            crate::utils::send_multipart_email(
+                "RustAuth - Instruksjoner for å tilbakestille passord".to_string(),
+                user_id,
                 active_user.email,
                 active_user.first_name,
                 active_user.last_name,
+                TokenPurpose::ResetPassword,
             )
                 .await
                 .expect("Klarte ikke å sende e-post!");
@@ -50,14 +54,14 @@ pub async fn post(
         Ok(_) => unreachable!(),
         Err(AppError::NotFound) => {
             crate::utils::emails::send_email_about_registration_attempt(
-                "RustAuth - Registreringsforsøk".to_string(),
-                generate_token_request.email.clone(),
+                "RustAuth - Tilbakestillingsforsøk".to_string(),
+                reset_password_request.email.clone(),
                 "Ukjent".to_string(),
                 "mottaker".to_string(),
             )
                 .await
                 .expect("Klarte ikke å sende e-post!");
-            
+
             Ok(StatusCode::OK)
         },
         Err(e) => Err(e),

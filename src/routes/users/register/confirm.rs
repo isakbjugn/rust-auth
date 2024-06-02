@@ -6,7 +6,7 @@ use serde::Deserialize;
 use sqlx::PgPool;
 
 use crate::db::activate_user::activate_user;
-use crate::db::get_one_inactive_by_id;
+use crate::types::tokens::TokenPurpose;
 use crate::utils::{AppError, verify_confirmation_token};
 
 #[derive(Deserialize)]
@@ -19,14 +19,12 @@ pub async fn post(
     State(state): State<PgPool>,
     Json(parameters): Json<Parameters>
 ) -> Result<impl IntoResponse, AppError> {
-    let confirmation_token = verify_confirmation_token(parameters.token.clone()).await?;
-    let user = get_one_inactive_by_id(&state, confirmation_token.user_id).await
-        .map_err(|e| {
+    let confirmation_token = verify_confirmation_token(parameters.token.clone(), TokenPurpose::Activate).await?;
+    match activate_user(&state, confirmation_token.user_id).await {
+        Ok(_) => Ok(StatusCode::OK),
+        Err(e) => {
             tracing::event!(target: "backend", tracing::Level::ERROR, "Brukeren er allerede aktivert: {:#?}", e);
-            AppError::AlreadyActivated
-        })?;
-    let user_id = uuid::Uuid::parse_str(&user.id).unwrap();
-    activate_user(&state, user_id).await?;
-    
-    Ok(StatusCode::OK)
+            Ok(StatusCode::OK)
+        }
+    }
 }

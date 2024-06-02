@@ -4,8 +4,8 @@ use crate::types::users::User;
 
 #[derive(Debug)]
 pub enum AppError {
-    AlreadyActivated,
     Conflict(User),
+    Forbidden(String),
     NotFound,
     ParseError(String),
     PasetoError(pasetors::errors::Error),
@@ -29,10 +29,13 @@ impl From<pasetors::errors::Error> for AppError {
 impl IntoResponse for AppError {
     fn into_response(self) -> axum::response::Response {
         match self {
-            AppError::AlreadyActivated => http::StatusCode::FORBIDDEN,
             AppError::Conflict(user) => {
                 error!("Conflicting resource error: {:?}", user);
                 http::StatusCode::CONFLICT
+            },
+            AppError::Forbidden(err) => {
+                error!("Forbidden error: {:?}", err);
+                http::StatusCode::FORBIDDEN
             },
             AppError::NotFound => http::StatusCode::NOT_FOUND,
             AppError::ParseError(err) => {

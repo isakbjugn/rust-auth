@@ -1,5 +1,6 @@
 pub mod create_user;
 pub mod activate_user;
+pub mod change_password;
 
 use sqlx::PgPool;
 use crate::types::users::{User, UserWithPasswordHash};
@@ -14,7 +15,7 @@ pub async fn get_all(db: &PgPool) -> Result<Vec<User>, sqlx::Error> {
     ).fetch_all(db).await
 }
 
-#[tracing::instrument(name = "Get one user from db", skip(db))]
+#[tracing::instrument(name = "Get one user from db by email", skip(db))]
 pub async fn get_one_by_email(db: &PgPool, email: String) -> Result<User, AppError> {
     match sqlx::query_as!(
         User,
@@ -24,15 +25,33 @@ pub async fn get_one_by_email(db: &PgPool, email: String) -> Result<User, AppErr
         email
     ).fetch_one(db).await {
         Ok(user) => Ok(user),
-        Err(sqlx::Error::Database(db_error)) if db_error.message() == "RowNotFound" => {
-            Err(AppError::NotFound)
-        },
         Err(sqlx::Error::RowNotFound) => {
-            tracing::event!(target: "backend", tracing::Level::ERROR, "DB-feil: Kunne ikke finne bruker med e-post: {:#?}", email);
+            tracing::event!(target: "backend", tracing::Level::ERROR, "Kunne ikke finne bruker med e-post: {:#?}", email);
             Err(AppError::NotFound)
         },
         Err(e) => {
-            tracing::event!(target: "backend", tracing::Level::ERROR, "Kunne ikke sende e-post: {:#?}", e);
+            tracing::event!(target: "backend", tracing::Level::ERROR, "Feil oppstod mens bruker ble hentet: {:#?}", e);
+            Err(AppError::SQLError(e))
+        }
+    }
+}
+
+#[tracing::instrument(name = "Get one user from db by id", skip(db))]
+pub async fn get_one_by_id(db: &PgPool, id: uuid::Uuid) -> Result<User, AppError> {
+    match sqlx::query_as!(
+        User,
+        "SELECT id, email, first_name, last_name, is_active, is_admin
+        FROM users
+        WHERE id = $1",
+        id
+    ).fetch_one(db).await {
+        Ok(user) => Ok(user),
+        Err(sqlx::Error::RowNotFound) => {
+            tracing::event!(target: "backend", tracing::Level::ERROR, "Kunne ikke finne bruker med id: {:#?}", id);
+            Err(AppError::NotFound)
+        },
+        Err(e) => {
+            tracing::event!(target: "backend", tracing::Level::ERROR, "Feil oppstod mens bruker ble hentet: {:#?}", e);
             Err(AppError::SQLError(e))
         }
     }
