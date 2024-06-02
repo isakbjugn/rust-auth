@@ -1,5 +1,5 @@
 import { BASE_API_URI } from '$lib/constants';
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 
 /** @type {import('./$types').Actions} */
 export const actions = {
@@ -24,8 +24,9 @@ export const actions = {
     });
 
     if (!res.ok) {
-      const response = await res.json();
-      return fail(400, { error: response.error });
+      error(500, {
+        message: 'Noe gikk dessverre galt.'
+      })
     }
 
     return { email: email, success: true  };

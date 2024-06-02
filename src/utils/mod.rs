@@ -1,6 +1,6 @@
 pub mod auth;
 mod error_handling;
-mod emails;
+pub mod emails;
 pub mod api_response;
 
 pub use auth::auth_token::{issue_auth_token, verify_auth_token};

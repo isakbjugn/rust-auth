@@ -122,3 +122,40 @@ pub async fn send_multipart_email(
     ));
     Ok(())
 }
+
+#[tracing::instrument(name = "Sending multipart e-mail", skip(recipient_first_name, recipient_last_name, template_name))]
+pub async fn send_email_about_registration_attempt(
+    subject: String,
+    recipient_email: String,
+    recipient_first_name: String,
+    recipient_last_name: String,
+    template_name: &str,
+) -> Result<(), AppError> {
+    tracing::event!(target: "backend", tracing::Level::DEBUG, subject = subject, email = recipient_email, "Sending multipart email");
+    let title = subject.clone();
+
+    let mut template_env = minijinja::Environment::new();
+    template_env.set_loader(path_loader("templates"));
+
+    let template = template_env.get_template(template_name).unwrap();
+    let ctx = minijinja::context! {
+        title => &title,
+    };
+    let html_text = template.render(ctx).unwrap();
+
+    let text = r#"
+        Noen har forsøkt å registrere en bruker med denne e-postadressen.
+        Vennligst ta kontakt dersom dette ikke var deg.
+        "#.to_string();
+
+    tokio::spawn(send_email(
+        None,
+        recipient_email,
+        recipient_first_name,
+        recipient_last_name,
+        subject,
+        html_text,
+        text,
+    ));
+    Ok(())
+}
