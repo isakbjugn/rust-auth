@@ -1,7 +1,8 @@
 use axum::extract::State;
-use axum::http;
+use axum::Json;
 use axum::response::IntoResponse;
 use sqlx::PgPool;
+
 use crate::db::get_all;
 use crate::extractors::auth_session::AuthSession;
 use crate::utils::AppError;
@@ -16,10 +17,5 @@ pub async fn get(
         false => return Err(AppError::Unauthorized),
     }?;
 
-    let response = http::Response::builder()
-        .status(http::StatusCode::OK)
-        .header(http::header::CONTENT_TYPE, "application/json")
-        .body(serde_json::to_string(&users).unwrap())
-        .unwrap();
-    Ok(response)
+    Ok(Json(users))
 }

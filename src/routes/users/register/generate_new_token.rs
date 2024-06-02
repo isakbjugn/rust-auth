@@ -1,10 +1,11 @@
 use axum::extract::State;
+use axum::http::StatusCode;
 use axum::Json;
+use axum::response::IntoResponse;
 use serde::Deserialize;
 use sqlx::PgPool;
 
 use crate::db::get_one_by_email;
-use crate::utils::api_response::ApiResponse;
 use crate::utils::AppError;
 
 #[derive(Deserialize)]
@@ -16,7 +17,7 @@ pub struct GenerateTokenRequest {
 pub async fn post(
     State(state): State<PgPool>,
     Json(generate_token_request): Json<GenerateTokenRequest>,
-) -> Result<ApiResponse<()>, AppError> {
+) -> Result<impl IntoResponse, AppError> {
     match get_one_by_email(&state, generate_token_request.email.clone()).await {
         Ok(inactive_user) if !inactive_user.is_active => {
             let user_id = uuid::Uuid::parse_str(&inactive_user.id).unwrap();
@@ -31,7 +32,7 @@ pub async fn post(
                 .await
                 .expect("Klarte ikke å sende e-post!");
             
-            Ok(ApiResponse::OK)
+            Ok(StatusCode::OK)
         },
         Ok(active_user) if active_user.is_active => {
             let user_id = uuid::Uuid::parse_str(&active_user.id).unwrap();
@@ -46,7 +47,7 @@ pub async fn post(
                 .await
                 .expect("Klarte ikke å sende e-post!");
 
-            Ok(ApiResponse::OK)
+            Ok(StatusCode::OK)
         },
         Ok(_) => unreachable!(),
         Err(AppError::NotFound) => {
@@ -60,7 +61,7 @@ pub async fn post(
                 .await
                 .expect("Klarte ikke å sende e-post!");
             
-            Ok(ApiResponse::OK)
+            Ok(StatusCode::OK)
         },
         Err(e) => Err(e),
     }

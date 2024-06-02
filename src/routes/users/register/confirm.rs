@@ -1,8 +1,10 @@
 use axum::extract::State;
-use axum::{http, Json};
+use axum::http::StatusCode;
+use axum::Json;
 use axum::response::IntoResponse;
 use serde::Deserialize;
 use sqlx::PgPool;
+
 use crate::db::activate_user::activate_user;
 use crate::db::get_one_inactive_by_id;
 use crate::utils::{AppError, verify_confirmation_token};
@@ -25,11 +27,6 @@ pub async fn post(
         })?;
     let user_id = uuid::Uuid::parse_str(&user.id).unwrap();
     activate_user(&state, user_id).await?;
-
-    let response = http::Response::builder()
-        .status(http::StatusCode::OK)
-        .header(http::header::CONTENT_TYPE, "text/plain")
-        .body(String::from("Kontoen din er aktivert."))
-        .unwrap();
-    Ok(response)
+    
+    Ok(StatusCode::OK)
 }

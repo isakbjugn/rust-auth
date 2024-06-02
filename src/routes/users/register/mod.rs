@@ -1,13 +1,13 @@
 pub mod confirm;
 pub mod generate_new_token;
 
-use axum::Json;
+use axum::{http::StatusCode, Json};
 use axum::extract::State;
+use axum::response::IntoResponse;
 use serde::Deserialize;
 use sqlx::PgPool;
 
 use crate::db::create_user::{create_user, NewUser};
-use crate::utils::api_response::ApiResponse;
 use crate::utils::AppError;
 use crate::utils::hash;
 
@@ -23,7 +23,7 @@ pub struct NewUserRequest {
 pub async fn post(
     State(state): State<PgPool>,
     Json(new_user_request): Json<NewUserRequest>,
-) -> Result<ApiResponse<()>, AppError> {
+) -> Result<impl IntoResponse, AppError> {
     let hashed_password = hash(new_user_request.password.as_bytes()).await;
     let create_new_user = NewUser {
         email: new_user_request.email,
@@ -46,8 +46,8 @@ pub async fn post(
             )
                 .await
                 .unwrap();
-            
-            Ok(ApiResponse::OK)
+
+            Ok(StatusCode::OK)
         },
         Err(AppError::Conflict(user)) => {
             let user_id = uuid::Uuid::parse_str(&user.id).unwrap();
@@ -75,7 +75,7 @@ pub async fn post(
                 }
             }.await.unwrap();
             
-            Ok(ApiResponse::OK)
+            Ok(StatusCode::OK)
         },
         Err(e) => {
             Err(e)
