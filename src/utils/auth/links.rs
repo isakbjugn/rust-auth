@@ -16,7 +16,7 @@ pub async fn create_confirmation_link(user_id: uuid::Uuid, token_purpose: TokenP
         },
         TokenPurpose::ResetPassword => {
             format!(
-                "{}/users/password/change-password?token={}",
+                "{}/reset-password/confirm?token={}",
                 web_address, issued_token,
             )
         },

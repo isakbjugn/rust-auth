@@ -1,10 +1,13 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
-import { User } from "./lib/types";
+import { User } from './lib/types';
 
 declare global {
 	namespace App {
-		// interface Error {}
+		interface Error {
+			message: string,
+			code?: string,
+		}
 		interface Locals {
 			user: User;
 		}

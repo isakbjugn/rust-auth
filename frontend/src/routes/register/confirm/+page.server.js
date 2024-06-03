@@ -1,4 +1,5 @@
 import { BASE_API_URI } from '$lib/constants';
+import { error } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageServerLoad} */
 export const load = async ({ request }) => {
@@ -16,7 +17,17 @@ export const load = async ({ request }) => {
   });
 
   if (!res.ok) {
-    return { error: true };
+    if (res.status === 403) {
+      return error(403, {
+        message: 'Denne lenken kan ikke brukes til å aktivere brukeren din',
+        code: 'FORBIDDEN'
+      })
+    } else {
+      return error(500, {
+        message: 'Noe gikk dessverre galt.',
+        code: 'INTERNAL_SERVER_ERROR'
+      })
+    }
   }
 
   if (res.ok) {

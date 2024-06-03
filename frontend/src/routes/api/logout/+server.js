@@ -1,4 +1,4 @@
-import { redirect } from "@sveltejs/kit";
+import { redirect } from '@sveltejs/kit';
 
 export async function POST({ cookies }) {
   cookies.delete('rust-auth', {

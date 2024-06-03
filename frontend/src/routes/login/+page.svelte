@@ -6,22 +6,28 @@
 	const conditionalEmailProps = form?.email ? { value: form.email } : {};
 </script>
 
-<form method="POST">
-	{#if form?.error}
-		<ErrorMessage>{form?.error}</ErrorMessage>
-	{/if}
-	<label>
-		Email
-		<input name="email" type="email" {...conditionalEmailProps}>
-	</label>
-	<label>
-		Password
-		<input name="password" type="password">
-	</label>
-	<button>Log in</button>
-</form>
+<section>
+	<form method="POST">
+		{#if form?.error}
+			<ErrorMessage>{form?.error}</ErrorMessage>
+		{/if}
+		<label>
+			E-post
+			<input name="email" type="email" {...conditionalEmailProps}>
+		</label>
+		<label>
+			Passord
+			<input name="password" type="password">
+		</label>
+		<button>Logg in</button>
+	</form>
+	<p class="remark"> Har du glemt passordet ditt? <a href="/reset-password">Tilbakestill</a></p>
+</section>
 
 <style>
+	.remark {
+		text-align: center;
+	}
 	form {
 		display: grid;
 		grid-gap: 1em;

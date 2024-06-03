@@ -41,9 +41,13 @@
 			<button>Registrer</button>
 		</fieldset>
 	</form>
+	<p class="remark"> Har du allerede en konto? <a href="/login">Logg inn</a></p>
 </section>
 
 <style>
+	.remark {
+		text-align: center;
+	}
 	fieldset {
 		display: grid;
 		grid-gap: 1em;

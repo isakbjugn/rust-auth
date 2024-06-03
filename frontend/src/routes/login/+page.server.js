@@ -36,6 +36,6 @@ export const actions = {
       secure: true
     })
 
-    throw redirect(302, '/user');
+    throw redirect(302, '/profile');
   }
 };

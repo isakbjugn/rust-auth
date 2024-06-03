@@ -15,7 +15,7 @@
 	</main>
 
 	<footer>
-		<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
+		<p>Sjekk ut <a href="https://github.com/isakbjugn/rust-auth">isakbjugn/rust-auth</a> om du vil se nærmere på koden</p>
 	</footer>
 </div>
 
