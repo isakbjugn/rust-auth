@@ -3,4 +3,13 @@
   import ErrorMessage from '$lib/components/ErrorMessage.svelte';
 </script>
 
-<ErrorMessage>{$page.error?.message}</ErrorMessage>
+<section>
+    <ErrorMessage>{$page.error?.message}</ErrorMessage>
+</section>
+
+<style>
+    section {
+        max-width: 480px;
+        margin: 0 auto;
+    }
+</style>

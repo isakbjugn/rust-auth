@@ -17,17 +17,16 @@
 
 <style>
 	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.3;
+		max-width: 480px;
+		margin: 0 auto;
+		text-align: center;
 	}
-
+	a {
+		min-width: 100%;
+	}
 	button {
-		width: 400px;
+		min-width: 100%;
 	}
-
 	h1 {
 		width: 100%;
 	}

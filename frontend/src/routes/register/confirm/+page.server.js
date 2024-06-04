@@ -18,12 +18,12 @@ export const load = async ({ request }) => {
 
   if (!res.ok) {
     if (res.status === 403) {
-      return error(403, {
+      error(403, {
         message: 'Denne lenken kan ikke brukes til å aktivere brukeren din',
         code: 'FORBIDDEN'
       })
     } else {
-      return error(500, {
+      error(500, {
         message: 'Noe gikk dessverre galt.',
         code: 'INTERNAL_SERVER_ERROR'
       })

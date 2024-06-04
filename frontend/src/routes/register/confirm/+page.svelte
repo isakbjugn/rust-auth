@@ -10,9 +10,6 @@
     {:else if $page.data.missingToken}
         <ErrorMessage>Aktiveringslenken du brukte er ikke gyldig</ErrorMessage>
         <a href="/register/resend">Send ny aktiveringslenke</a>
-    {:else if $page.data.error}
-        <ErrorMessage>Noe gikk galt under aktiveringen</ErrorMessage>
-        <a href="/register/resend">Send ny aktiveringslenke</a>
     {:else}
         <p>Aktiverer bruker...</p>
     {/if}
@@ -20,6 +17,8 @@
 
 <style>
     section {
+        max-width: 480px;
+        margin: 0 auto;
         text-align: center;
     }
 </style>

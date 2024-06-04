@@ -25,22 +25,16 @@
 </section>
 
 <style>
-	.remark {
-		text-align: center;
+	section {
+		max-width: 480px;
+		margin: 0 auto;
 	}
 	form {
 		display: grid;
 		grid-gap: 1em;
-		width: 480px;
-		max-width: 480px;
-		margin: 0 auto;
 	}
-	@media screen and (max-width: 512px) {
-		form {
-			width: unset;
-			max-width: 100%;
-			margin: 0 16px;
-		}
+	.remark {
+		text-align: center;
 	}
 	label {
 		display: grid;

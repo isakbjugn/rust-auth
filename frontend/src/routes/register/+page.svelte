@@ -17,50 +17,41 @@
 		<ErrorMessage>Noe gikk galt!</ErrorMessage>
 	{/if}
 	<form method="POST">
-		<fieldset>
-			<legend>Registrer deg</legend>
-			{#if form?.missing_fields}
-				<p class="error">Vennligst fyll ut alle felt</p>
-			{/if}
-			<label>
-				Fornavn
-				<input name="first_name" type="text" required {...conditionalFirstNameProps}>
-			</label>
-			<label>
-				Etternavn
-				<input name="last_name" type="text" required {...conditionalLastNameProps}>
-			</label>
-			<label>
-				E-postadresse
-				<input name="email" type="email" required {...conditionalEmailProps}>
-			</label>
-			<label>
-				Passord
-				<input name="password" type="password" required>
-			</label>
-			<button>Registrer</button>
-		</fieldset>
+		{#if form?.missing_fields}
+			<p class="error">Vennligst fyll ut alle felt</p>
+		{/if}
+		<label>
+			Fornavn
+			<input name="first_name" type="text" required {...conditionalFirstNameProps}>
+		</label>
+		<label>
+			Etternavn
+			<input name="last_name" type="text" required {...conditionalLastNameProps}>
+		</label>
+		<label>
+			E-postadresse
+			<input name="email" type="email" required {...conditionalEmailProps}>
+		</label>
+		<label>
+			Passord
+			<input name="password" type="password" required>
+		</label>
+		<button>Registrer</button>
 	</form>
 	<p class="remark"> Har du allerede en konto? <a href="/login">Logg inn</a></p>
 </section>
 
 <style>
-	.remark {
-		text-align: center;
-	}
-	fieldset {
-		display: grid;
-		grid-gap: 1em;
-		width: 480px;
+	section {
 		max-width: 480px;
 		margin: 0 auto;
 	}
-	@media screen and (max-width: 512px) {
-		form {
-			width: unset;
-			max-width: 100%;
-			margin: 0 16px;
-		}
+	form {
+		display: grid;
+		grid-gap: 1em;
+	}
+	.remark {
+		text-align: center;
 	}
 	label {
 		display: grid;
