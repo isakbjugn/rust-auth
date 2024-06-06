@@ -23,7 +23,7 @@ export const actions = {
       if (res.status === 401) {
         return fail(401, { error: 'Feil brukernavn eller passord', email: body.email });
       } else {
-        return error (res.status, { message: 'Noe gikk galt' });
+        error(res.status, { message: 'Noe gikk galt' });
       }
     }
 

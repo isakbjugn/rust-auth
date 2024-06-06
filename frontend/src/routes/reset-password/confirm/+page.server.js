@@ -30,12 +30,17 @@ export const actions = {
 
     if (!res.ok) {
       if (res.status === 403) {
-        return error(403, {
+        error(403, {
           message: 'Denne lenken kan ikke brukes til å tilbakestille passordet ditt',
           code: 'FORBIDDEN'
         })
+      } else if (res.status === 404) {
+        error(403, {
+          message: 'Denne brukeren finnes ikke',
+          code: 'NOT_FOUND'
+        })
       } else {
-        return error(500, {
+        error(500, {
           message: 'Noe gikk dessverre galt.',
           code: 'INTERNAL_SERVER_ERROR'
         })

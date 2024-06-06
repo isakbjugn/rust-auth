@@ -3,9 +3,19 @@
   import ErrorMessage from '$lib/components/ErrorMessage.svelte';
 </script>
 
-{#if $page.data.error}
-    <ErrorMessage>{$page.data.error}</ErrorMessage>
-    {#if $page.data.error.code === 'FORBIDDEN'}
-        <a href="/reset-password">Be om ny tilbakestillingslenke</a>
+<section>
+    {#if $page.error}
+        <ErrorMessage>{$page.error.message}</ErrorMessage>
+        {#if $page.error.code && ['FORBIDDEN', 'NOT_FOUND'].includes($page.error.code)}
+            <a href="/reset-password">Be om ny tilbakestillingslenke</a>
+        {/if}
     {/if}
-{/if}
+</section>
+
+<style>
+    section {
+        max-width: 480px;
+        margin: 0 auto;
+        text-align: center;
+    }
+</style>

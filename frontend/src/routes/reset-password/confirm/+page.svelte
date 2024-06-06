@@ -7,12 +7,15 @@
 </script>
 
 <section>
-    {#if form?.success}
-        <SuccessMessage>Du har nå byttet passord!</SuccessMessage>
-    {:else if form?.missingToken}
-        <ErrorMessage>Tilbakestillingslenken du brukte er ikke gyldig</ErrorMessage>
-        <a href="/register/resend">Send ny aktiveringslenke</a>
-
+    {#if form?.missingToken}
+        <div class="center">
+            <ErrorMessage>Tilbakestillingslenken du brukte er ikke gyldig</ErrorMessage>
+            <a href="/reset-password">Be om ny tilbakestillingslenke</a>
+        </div>
+    {:else if form?.success}
+        <div class="center">
+            <SuccessMessage>Du har nå byttet passord!</SuccessMessage>
+        </div>
     {:else}
         <form method="post">
             <label>
@@ -25,19 +28,16 @@
 </section>
 
 <style>
-    form {
-        display: grid;
-        grid-gap: 1em;
-        width: 480px;
+    section {
         max-width: 480px;
         margin: 0 auto;
     }
-    @media screen and (max-width: 512px) {
-        form {
-            width: unset;
-            max-width: 100%;
-            margin: 0 16px;
-        }
+    .center {
+        text-align: center;
+    }
+    form {
+        display: grid;
+        grid-gap: 1em;
     }
     label {
         display: grid;
