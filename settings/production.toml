@@ -1,2 +1,2 @@
 [token]
-expiration_minutes = 5
+expiration_minutes = 2880 # 48 hours
